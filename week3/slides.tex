@@ -1,0 +1,122 @@
+\documentclass{beamer}
+
+\usepackage{minted}
+
+\usetheme{Frankfurt}
+
+\title{Workshop 2 -- Making Choices}
+\author{COMP20005 Engineering Computation}
+\institute{The University of Melbourne}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Today's Workshop}
+    \begin{block}{Agenda}
+        In today's class, you should learn:
+        \begin{itemize}
+            \item How to use selection statements in C.
+            \item Common gotcha's with logic operators.
+            \item Writing comments to document your code.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Second Slide Name Here}
+\end{frame}
+
+\section{Exercise: 3.2}
+\stepcounter{subsection}
+
+\begin{frame}[fragile]{3.2 a)}
+    \begin{minted}{c}
+    i=3; j=4;
+    if (i<j && j<6) {
+        i = i+j;
+    } else {
+        j = i+j;
+    }
+    printf ("i=%d, j=%d\n", i, j);
+    \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{3.2 b)}
+    \begin{minted}{c}
+    i=3; j=4; k=7;
+    if ((i<j || j<k) && j<i) {
+        i = i+1;
+        if (i*i > k) {
+            k = k+1;
+        }
+    } else {
+        j = j+1;
+        if (i*i > k) {
+            k = k+2;
+        }
+    }
+    printf ("i=%d, j=%d, k=%d\n", i, j, k);
+    \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{3.2 c)}
+    \begin{minted}{c}
+        month = 7;
+        if (month == 2) {
+            days = 28;
+        } else if (month == 4 || 6 || 9 || 11) {
+            days = 30;
+        } else {
+            days = 31;
+        }
+        printf ("days=%d\n", days);
+    \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{3.2 d)}
+    \begin{minted}{c}
+        x = 1; y = 2;
+        if (x>y)
+            printf ("x=%d, y=%d\n", x, y);
+            x = x+1;
+        if (x<y)
+            printf ("x=%d, y=%d\n", x, y);
+            y = y+2;
+        printf ("x=%d, y=%d\n", x, y);
+    \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{3.2 e)}
+    \begin{minted}{c}
+        x = 1; y = 2;
+        if (x>y); {
+            printf ("x=%d, y=%d\n", x, y);
+            x = x+1;
+        }
+        if (x<y); {
+            printf ("x=%d, y=%d\n", x, y);
+            y = y+2;
+        }
+        printf ("x=%d, y=%d\n", x, y);
+    \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{3.2 f)}
+    \begin{minted}{c}
+        x = 0; y = 0;
+        if (y<x) {
+            printf ("y is smaller than x\n");
+        } else if (y=x) {
+            printf ("x and y are equal\n");
+        } else {
+            printf ("y is greater\n");
+        }
+    \end{minted}
+\end{frame}
+
+
+\end{document}
+
+% vim: ft=tex ts=4 sw=4 lbr et
