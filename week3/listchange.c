@@ -48,6 +48,14 @@ main (int argc, char **argv)
     {
         printf ("%d, ", COIN20);
         balance -= COIN20;
+
+        /** We sometimes need 2 twenty cent coins in the list, eg to make
+         *  up 45 cents. */
+        if (balance >= COIN20)
+        {
+            printf ("%d, ", COIN20);
+            balance -= COIN20;
+        }
     }
 
     if (balance >= COIN10)
