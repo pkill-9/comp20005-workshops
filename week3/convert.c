@@ -53,11 +53,11 @@ main (int argc, char **argv)
 
     case 'G':
         /** kilograms to pounds */
-        printf ("%f lbs", input / 0.454);
+        printf ("%f lbs\n", input / 0.454);
         break;
 
     default:
-        printf ("\"%c\": Unknown unit.\n");
+        printf ("\"%c\": Unknown unit.\n", units);
     }
 
     return 0;
