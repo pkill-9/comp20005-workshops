@@ -89,6 +89,8 @@ main (int argc, char **argv)
         balance -= COIN1;
     }
 
+    printf ("\n");
+
     /** Check that we have provided coins adding up to the value that the
      *  user specified. If we have not provided enough coins, the balance
      *  will not be 0. */
