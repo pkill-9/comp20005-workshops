@@ -5,7 +5,10 @@
 listchange:	listchange.c
 	gcc -Wall -ansi -o listchange listchange.c
 
-it:		listchange
+convert:	convert.c
+	gcc -Wall -ansi -o convert convert.c
+
+it:		listchange convert
 
 so:
 	./testchange.sh
