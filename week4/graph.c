@@ -25,7 +25,7 @@ main (int argc, char **argv)
         }
 
         /** print the axis and label first */
-        printf ("%d |", value);
+        printf ("%2d |", value);
 
         /** now print a line of asterisks of length specified by value */
         for ( ; value > 0; value --)
