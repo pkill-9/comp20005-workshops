@@ -1,0 +1,144 @@
+\documentclass{beamer}
+
+\usetheme{Frankfurt}
+
+\title{Workshop 4 -- Abstraction with Functions}
+\author{COMP20005 Engineering Computation}
+\institute{The University of Melbourne}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Contact Info}
+    \begin{itemize}
+        \item Matt Signorini
+        \item Email: \texttt{msignorini@unimelb.edu.au}
+        \item Also LMS discussion forum
+        \item My workshop solutions available at \url{https://github.com/pkill-9/comp20005-workshops/}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Today's Workshop}
+    \begin{block}{Agenda}
+        In today's class, you should learn:
+        \begin{itemize}
+            \item How to write and interpret simple functions.
+            \item How to express a problem in terms of functions.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\section{Exercise: 5.1}
+\stepcounter{subsection}
+
+\begin{frame}{Max of two ints}
+    Write a function \texttt{max\_2\_ints} which takes two int arguments
+    and returns the larger one.
+\end{frame}
+
+\section{Exercise: 5.2}
+\stepcounter{subsection}
+
+\begin{frame}{Max of four ints}
+    Write a function \texttt{max\_4\_ints} that returns the largest of it's
+    four int arguments.
+\end{frame}
+
+\section{Exercise: 5.3}
+\stepcounter{subsection}
+
+\begin{frame}{Raise an int to a given power}
+    Write a function that takes two ints, and returns the first argument
+    raised to the power of the second argument. Note that C does not
+    provide a power operator for int arithmetic in the way that Matlab does.
+\end{frame}
+
+\section{Lab Exercises}
+\stepcounter{subsection}
+
+\begin{frame}{Exercises}
+    \begin{block}{Exercises}
+        \begin{itemize}
+            \item Exercise 5.5 -- perfect numbers
+            \item Exercise 5.6 -- amicable pairs
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Perfect Numbers}
+    \begin{itemize}
+        \item You will need a loop that finds factors and adds them to a
+            sum. Then compare the sum of the factors to the number.
+        \item \emph{Hint:} Brute force is acceptable for finding the next
+            perfect number. Can you use your \texttt{isperfect} function to
+            help here?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Amicable Pairs}
+    \begin{itemize}
+        \item Consider two numbers a and b.
+        \item Factors of a must add up to b \emph{and}
+        \item Factors of b must add up to a.
+        \item You may find that implementing an additional function will
+            simplify your solution. Take two numbers and return true if the
+            factors of the first number add up to the second.
+    \end{itemize}
+\end{frame}
+
+%
+%   _________________________________________
+%  /  There was once a programmer who was    \
+%  | attached to the court of the warlord of |
+%  | Wu. The warlord asked the programmer:   |
+%  | "Which is easier to design: an          |
+%  | accounting package or an operating      |
+%  | system?"                                |
+%  |                                         |
+%  | "An operating system," replied the      |
+%  | programmer.                             |
+%  |                                         |
+%  | The warlord uttered an exclamation of   |
+%  | disbelief. "Surely an accounting        |
+%  | package is trivial next to the          |
+%  | complexity of an operating system," he  |
+%  | said.                                   |
+%  |                                         |
+%  | "Not so," said the programmer, "when    |
+%  | designing an accounting package, the    |
+%  | programmer operates as a mediator       |
+%  | between people having different ideas:  |
+%  | how it must operate, how its reports    |
+%  | must appear, and how it must conform to |
+%  | the tax laws. By contrast, an operating |
+%  | system is not limited by outside        |
+%  | appearances. When designing an          |
+%  | operating system, the programmer seeks  |
+%  | the simplest harmony between machine    |
+%  | and ideas. This is why an operating     |
+%  | system is easier to design."            |
+%  |                                         |
+%  | The warlord of Wu nodded and smiled.    |
+%  | "That is all good and well, but which   |
+%  | is easier to debug?"                    |
+%  |                                         |
+%  | The programmer made no reply.           |
+%  |                                         |
+%  | -- Geoffrey James, "The Tao of          |
+%  \ Programming"                            /
+%   -----------------------------------------
+%         \ (__)
+%           (oo)
+%     /------\/
+%    / |    ||
+%   *  /\---/\
+%      ~~   ~~
+%
+
+
+\end{document}
+
+% vim: ft=tex ts=4 sw=4 lbr et
