@@ -8,7 +8,9 @@
 #include "sumfactors.h"
 
 int isamicable (int n1, int n2);
+int next_amicable (int number);
 void check_input (int a, int b);
+int max (int n1, int n2);
 
 
     int
@@ -29,7 +31,36 @@ main (int argc, char **argv)
     printf ("%d and %d %s an amicable pair.\n", a, b, 
       isamicable (a, b)? "are" : "are not");
 
+    /** We will start next_amicable on the larger of the current pair, so
+     *  that it won't just find the other half of the current pair. */
+    a = next_amicable (max (a, b));
+    b = sumfactors (a);
+    printf ("Next amicable pair is %d and %d\n", a, b);
+
     return 0;
+}
+
+/**
+ *  Returns one number of the next largest amicable pair. The second number
+ *  of the pair can then be computed by sumfactors. This function only
+ *  requires one parameter, the second amicable number will be calculated
+ *  by summing the factors of the number that we are given.
+ */
+    int
+next_amicable (int number)
+{
+    int pair;
+
+    number += 1;
+    pair = sumfactors (number);
+
+    while (sumfactors (pair) != number || number == pair)
+    {
+        number ++;
+        pair = sumfactors (number);
+    }
+
+    return number;
 }
 
 /**
@@ -69,6 +100,18 @@ check_input (int a, int b)
         printf ("Cannot be the same number.\n");
         exit (1);
     }
+}
+
+/**
+ *  Returns the larger of the two arguments.
+ */
+    int
+max (int n1, int n2)
+{
+    if (n1 > n2)
+        return n1;
+
+    return n2;
 }
 
 /** vim: set ts=4 sw=4 et : */
