@@ -21,9 +21,24 @@ main (int argc, char **argv)
         printf ("Only numbers\n");
     }
 
-    printf ("%d %s perfect\n", num, isperfect (num)? "is" : "isn't");
+    printf ("%d %s perfect.\n", num, isperfect (num)? "is" : "isn't");
+    printf ("Next biggest perfect number is %d\n", nextperfect (num));
 
     return 0;
+}
+
+/**
+ *  Finds the next largest perfect number from it's argument. If the
+ *  argument is perfect, this function will search for the next largest
+ *  perfect number.
+ */
+    int
+nextperfect (int number)
+{
+    for (number ++; isperfect (number) == 0; number ++)
+        ;
+
+    return number;
 }
 
 /**
