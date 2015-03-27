@@ -4,6 +4,7 @@
  */
 
 #include <stdio.h>
+#include "sumfactors.h"
 
 int isperfect (int number);
 int nextperfect (int number);
@@ -48,15 +49,7 @@ nextperfect (int number)
     int
 isperfect (int number)
 {
-    int sum = 0, divisor;
-
-    for (divisor = 1; divisor < number; divisor ++)
-    {
-        if (number % divisor == 0)
-            sum += divisor;
-    }
-
-    if (sum == number)
+    if (sumfactors (number) == number)
     {
         return 1;
     }
