@@ -1,0 +1,54 @@
+/**
+ *  Functions to test if a number is perfect and find the next perfect
+ *  number, as well as scaffolding to test these functions.
+ */
+
+#include <stdio.h>
+
+int isperfect (int number);
+int nextperfect (int number);
+
+
+    int
+main (int argc, char **argv)
+{
+    int num;
+
+    printf ("Enter a number: ");
+
+    if (scanf ("%d", &num) != 1)
+    {
+        printf ("Only numbers\n");
+    }
+
+    printf ("%d %s perfect\n", num, isperfect (num)? "is" : "isn't");
+
+    return 0;
+}
+
+/**
+ *  Test if a given number is perfect, meaning that the number's factors
+ *  add up to the number itself.
+ */
+    int
+isperfect (int number)
+{
+    int sum = 0, divisor;
+
+    for (divisor = 1; divisor < number; divisor ++)
+    {
+        if (number % divisor == 0)
+            sum += divisor;
+    }
+
+    if (sum == number)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+/** vim: set ts=4 sw=4 et : */
