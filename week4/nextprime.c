@@ -18,7 +18,6 @@ main (int argc, char **argv)
         return 1;
     }
 
-    /** keep going round this loop until we find a prime number. */
     while (!isprime)
     {
         isprime = 1;
