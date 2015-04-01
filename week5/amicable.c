@@ -9,33 +9,23 @@
 
 int isamicable (int n1, int n2);
 int next_amicable (int number);
-void check_input (int a, int b);
-int max (int n1, int n2);
 
 
     int
 main (int argc, char **argv)
 {
-    int a, b;
+    int number = 1, pair;
 
-    printf ("Enter two numbers: ");
-
-    if (scanf ("%d %d", &a, &b) != 2)
+    while (1)
     {
-        printf ("Only numbers accepted.\n");
-        return 1;
+        /** number always contains the larger number of the amicable pair.
+         *  Start next_amicable searching from the largest of the last
+         *  pair, so that the next amicable pair it will find will not be
+         *  the same pair. */
+        number = next_amicable (number);
+        pair = sumfactors (number);
+        printf ("%10d and %10d\n", pair, number);
     }
-
-    check_input (a, b);
-
-    printf ("%d and %d %s an amicable pair.\n", a, b, 
-      isamicable (a, b)? "are" : "are not");
-
-    /** We will start next_amicable on the larger of the current pair, so
-     *  that it won't just find the other half of the current pair. */
-    a = next_amicable (max (a, b));
-    b = sumfactors (a);
-    printf ("Next amicable pair is %d and %d\n", a, b);
 
     return 0;
 }
@@ -45,6 +35,8 @@ main (int argc, char **argv)
  *  of the pair can then be computed by sumfactors. This function only
  *  requires one parameter, the second amicable number will be calculated
  *  by summing the factors of the number that we are given.
+ *
+ *  Returns the larger number of the pair.
  */
     int
 next_amicable (int number)
@@ -60,7 +52,10 @@ next_amicable (int number)
         pair = sumfactors (number);
     }
 
-    return number;
+    /** note that number and pair are not the same number, and we have
+     *  swept number up through all the smaller numbers. This means that
+     *  pair has to be greater than number. */
+    return pair;
 }
 
 /**
@@ -79,39 +74,6 @@ isamicable (int n1, int n2)
     {
         return 0;
     }
-}
-
-/**
- *  Verify that the two numbers entered by the user are valid. They both
- *  must be nonzero, and cannot be the same number. If there is a problem,
- *  this function prints an error message and aborts the program.
- */
-    void
-check_input (int a, int b)
-{
-    if (a == 0 || b == 0)
-    {
-        printf ("Numbers must be nonzero.\n");
-        exit (1);
-    }
-
-    if (a == b)
-    {
-        printf ("Cannot be the same number.\n");
-        exit (1);
-    }
-}
-
-/**
- *  Returns the larger of the two arguments.
- */
-    int
-max (int n1, int n2)
-{
-    if (n1 > n2)
-        return n1;
-
-    return n2;
 }
 
 /** vim: set ts=4 sw=4 et : */
