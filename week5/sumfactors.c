@@ -8,12 +8,18 @@
     int
 sumfactors (int number)
 {
-    int sum = 0, divisor;
+    int sum = 1, divisor;
 
-    for (divisor = 1; divisor < number; divisor ++)
+    for (divisor = 2; divisor * divisor <= number; divisor ++)
     {
+        /** if divisor goes evenly into number, we have found two factors,
+         *  divisor and number / divisor, since the product of the two
+         *  equals number. */
         if (number % divisor == 0)
+        {
             sum += divisor;
+            sum += number / divisor;
+        }
     }
 
     return sum;
