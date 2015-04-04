@@ -8,11 +8,14 @@
 #include <stdio.h>
 #include <math.h>
 
+#define PI              3.14159265358979323846
+
 /**********************************************************/
 
 void do_stage_1 (double *perimeter, double *area, int *id, int *nvals);
 double next_area_segment (double x1, double y1, double x2, double y2);
 double distance_between (double x1, double y1, double x2, double y2);
+double eccentricity (double perimeter, double area);
 
 /**********************************************************/
 
@@ -82,7 +85,7 @@ do_stage_1 (double *perimeter, double *area, int *id, int *nvals)
 
     printf ("perimeter      = %2.2f m\n", *perimeter);
     printf ("area           = %2.2f m^2\n", *area);
-    printf ("eccentricity   = unknown\n");
+    printf ("eccentricity   = %2.2f\n", eccentricity (*perimeter, *area));
 }
 
 /**********************************************************/
@@ -115,6 +118,18 @@ distance_between (double x1, double y1, double x2, double y2)
     distance = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
     distance = sqrt (distance);
     return distance;
+}
+
+/**********************************************************/
+
+/**
+ *  Calculate eccentricity of a polygon, defined as the square of the
+ *  perimeter divided by the area, divided by 4 pi.
+ */
+    double
+eccentricity (double perimeter, double area)
+{
+    return (perimeter * perimeter) / area / (4.0 * PI);
 }
 
 /**********************************************************/
