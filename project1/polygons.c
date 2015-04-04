@@ -11,6 +11,7 @@
 /**********************************************************/
 
 void do_stage_1 (double *perimeter, double *area, int *id, int *nvals);
+double next_area_segment (double x1, double y1, double x2, double y2);
 double distance_between (double x1, double y1, double x2, double y2);
 
 /**********************************************************/
@@ -66,6 +67,7 @@ do_stage_1 (double *perimeter, double *area, int *id, int *nvals)
         scanf ("%lf %lf", &x2, &y2);
         printf ("%4.1f %4.1f\n", x2, y2);
         *perimeter += distance_between (x1, y1, x2, y2);
+        *area += next_area_segment (x1, y1, x2, y2);
 
         /** endpoint of the current edge section becomes the start point
          *  of the next section. */
@@ -76,10 +78,29 @@ do_stage_1 (double *perimeter, double *area, int *id, int *nvals)
     /** Final edge section is from the final vertex back to the initial
      *  vertex, closing the loop of the perimeter. */
     *perimeter += distance_between (x2, y2, xi, yi);
+    *area += next_area_segment (x1, y1, xi, yi);
 
     printf ("perimeter      = %2.2f m\n", *perimeter);
-    printf ("area           = unknown m^2\n");
+    printf ("area           = %2.2f m^2\n", *area);
     printf ("eccentricity   = unknown\n");
+}
+
+/**********************************************************/
+
+/**
+ *  Calculates the value to add to the total area for the segment between
+ *  the line from x1,y1 to x2,y2 and the x axis. The value returned by
+ *  this function may be positive or negative.
+ */
+    double
+next_area_segment (double x1, double y1, double x2, double y2)
+{
+    /** The edge of the polygon and the x axis form the boundaries of a
+     *  trapezoid of area, where a and b are the two y values, and h is
+     *  the difference in x values. A negative h indicates that the
+     *  trapezoid is outside the polygon, and should be subtracted from
+     *  the subtotal. */
+    return 0.5 * (y1 + y2) * (x2 - x1);
 }
 
 /**********************************************************/
