@@ -13,6 +13,11 @@
 /**********************************************************/
 
 void do_stage_1 (double *perimeter, double *area, int *id, int *nvals);
+void do_stage_2 (int id, int nvals, double perimeter, double area);
+void print_header (void);
+void print_footer (void);
+void print_row (int id, int nvals, double perimeter, double area);
+void read_next_polygon (int *id, int *nvals, double *perimeter, double *area);
 double next_area_segment (double x1, double y1, double x2, double y2);
 double distance_between (double x1, double y1, double x2, double y2);
 double eccentricity (double perimeter, double area);
@@ -26,6 +31,7 @@ main (int argc, char **argv)
     int polygon_id, num_vertices;
 
     do_stage_1 (&perimeter, &area, &polygon_id, &num_vertices);
+    do_stage_2 (polygon_id, num_vertices, perimeter, area);
 
     return 0;
 }
@@ -58,7 +64,7 @@ do_stage_1 (double *perimeter, double *area, int *id, int *nvals)
 
     /** Stage 1. Read the first polygon and calculate the perimeter and
      *  area. */
-    printf ("Stage 1\n=======\n");
+    printf ("\nStage 1\n=======\n");
     printf ("First polygon is %d\n", *id);
     printf ("   x_val    y_val\n");
     printf ("%4.1f %4.1f\n", xi, yi);
@@ -86,6 +92,113 @@ do_stage_1 (double *perimeter, double *area, int *id, int *nvals)
     printf ("perimeter      = %2.2f m\n", *perimeter);
     printf ("area           = %2.2f m^2\n", *area);
     printf ("eccentricity   = %2.2f\n", eccentricity (*perimeter, *area));
+}
+
+/**********************************************************/
+
+/**
+ *  Stage 2 of the project. This function will read the vertex coords for
+ *  the rest of the polygons and summarise them with a table of values.
+ *
+ *  The params for this function are the id, nvals perimeter and area of
+ *  the first polygon, which was read by stage 1.
+ */
+    void
+do_stage_2 (int id, int nvals, double perimeter, double area)
+{
+    print_header ();
+
+    while (nvals != 0)
+    {
+        /** first print the row in the summary for the previous polygon,
+         *  then read the next set of vertices. */
+        print_row (id, nvals, perimeter, area);
+        read_next_polygon (&id, &nvals, &perimeter, &area);
+    }
+
+    print_footer ();
+}
+
+/**********************************************************/
+
+/**
+ *  Prints the table header for stage 2.
+ */
+    void
+print_header (void)
+{
+    printf ("\nStage 2\n=======\n");
+    printf ("+-------+-------+-------+-------+-------+\n");
+    printf ("|    id |  nval | perim |  area | eccen |\n");
+    printf ("+-------+-------+-------+-------+-------+\n");
+}
+
+/**********************************************************/
+
+/**
+ *  Prints the table footer for stage 2.
+ */
+    void
+print_footer (void)
+{
+    printf ("+-------+-------+-------+-------+-------+\n");
+}
+
+/**********************************************************/
+
+/**
+ *  This function prints out a single row of the summary table for stage 2
+ *  of the project. Params are the id, nvals, perimeter and area of the
+ *  polygon; eccentricity can be calculated from the perimeter and area.
+ */
+    void
+print_row (int id, int nvals, double perimeter, double area)
+{
+    printf ("| %5d | %5d | %5.2f | %5.2f | %5.2f |\n", id, nvals, perimeter,
+      area, eccentricity (perimeter, area));
+}
+
+/**********************************************************/
+
+/**
+ *  Reads the next polygon from stdin and stores it's id, number of
+ *  vertices, perimeter and area in the variables pointed to by the
+ *  corresponding parameters to this function.
+ */
+    void
+read_next_polygon (int *id, int *nvals, double *perimeter, double *area)
+{
+    int i;
+    double xi, yi;
+    double x1, y1, x2, y2;
+
+    *perimeter = 0;
+    *area = 0;
+
+    /** if there are no more polygons to be read, we will get a single line
+     *  with nvals of 0 and no polygon id */
+    if (scanf ("%d %d", nvals, id) != 2)
+    {
+        *nvals = 0;
+        return;
+    }
+
+    scanf ("%lf %lf", &xi, &yi);
+    x1 = xi;
+    y1 = yi;
+
+    for (i = 1; i < *nvals; i ++)
+    {
+        scanf ("%lf %lf", &x2, &y2);
+        *perimeter += distance_between (x1, y1, x2, y2);
+        *area += next_area_segment (x1, y1, x2, y2);
+
+        x1 = x2;
+        y1 = y2;
+    }
+
+    *perimeter += distance_between (x2, y2, xi, yi);
+    *area += next_area_segment (x2, y2, xi, yi);
 }
 
 /**********************************************************/
