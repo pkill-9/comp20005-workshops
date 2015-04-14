@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #define PI                      3.14159265358979323846
@@ -17,15 +18,21 @@
 /** format string for the list of coordinates for stage 1. */
 #define COORDINATE_FORMAT       "%7.1f %8.1f\n"
 
+/** According to the project spec, each polygon contains no more than 100
+ *  vertices */
+#define MAX_VERTICES            100
+
 /**********************************************************/
 
 void read_next_polygon (int is_stage_1);
 void print_header (void);
 void print_footer (void);
 void print_row (int id, int nvals, double perimeter, double area);
+void print_stage_3 (int max_id, double *xvals, double *yvals, int count);
 double next_area_segment (double x1, double y1, double x2, double y2);
 double distance_between (double x1, double y1, double x2, double y2);
 double eccentricity (double perimeter, double area);
+void copy_global_coords_to (double *dest_xvals, double *dest_yvals, int count);
 
 /**********************************************************/
 
@@ -37,12 +44,17 @@ double eccentricity (double perimeter, double area);
  */
 double saved_perimeter, saved_area;
 int saved_id, saved_nvals;
+double saved_xvals [MAX_VERTICES], saved_yvals [MAX_VERTICES];
 
 /**********************************************************/
 
     int
 main (int argc, char **argv)
 {
+    double biggest_xvals [MAX_VERTICES], biggest_yvals [MAX_VERTICES];
+    double max_area = 0;
+    int max_id, max_nvals;
+
     /** read the first polygon for stage 1. */
     read_next_polygon (STAGE_1);
 
@@ -54,9 +66,28 @@ main (int argc, char **argv)
          *  then read the next set of vertices. */
         print_row (saved_id, saved_nvals, saved_perimeter, saved_area);
         read_next_polygon (!STAGE_1);
+
+        /** check if this polygon has the largest area. If so, save it's 
+         *  list points. */
+        if (saved_area >= max_area)
+        {
+            /** in cases of area ties, the polygon with the smallest id is
+             *  chosen. */
+            if (saved_area == max_area && max_id < saved_id)
+                continue;
+
+            max_area = saved_area;
+            max_id = saved_id;
+            max_nvals = saved_nvals;
+            copy_global_coords_to (biggest_xvals, biggest_yvals, max_nvals);
+        }
     }
 
     print_footer ();
+
+    /** Stage 3. Print out the coordinates of the polygon with the largest 
+     *  area. */
+    print_stage_3 (max_id, biggest_xvals, biggest_yvals, max_nvals);
 
     return 0;
 }
@@ -86,6 +117,13 @@ read_next_polygon (int is_stage_1)
     if (scanf ("%d %d", &saved_nvals, &saved_id) != 2)
         return;
 
+    /** check that nvals is within the bounds given in the spec. */
+    if (saved_nvals > MAX_VERTICES)
+    {
+        printf ("Error: Too many vertices\n");
+        exit (1);
+    }
+
     scanf ("%lf %lf", &xi, &yi);
     x1 = xi;
     y1 = yi;
@@ -107,9 +145,15 @@ read_next_polygon (int is_stage_1)
         if (is_stage_1)
             printf (COORDINATE_FORMAT, x2, y2);
 
+        saved_xvals [i - 1] = x1;
+        saved_yvals [i - 1] = y1;
+
         x1 = x2;
         y1 = y2;
     }
+
+    saved_xvals [i] = x2;
+    saved_yvals [i] = y2;
 
     /** lastly, add the section of perimeter and the area segment for the
      *  edge between the final point and the first point, closing the
@@ -160,6 +204,25 @@ print_row (int id, int nvals, double perimeter, double area)
 /**********************************************************/
 
 /**
+ *  Print output for stage 3, consisting of the header and a list of the
+ *  coordinates of the largest polygon.
+ */
+    void
+print_stage_3 (int id, double *xvals, double *yvals, int count)
+{
+    int i;
+
+    printf ("\nStage 3\n=======\n");
+    printf ("Largest polygon is %d\n", id);
+    printf ("   x_val    y_val\n");
+
+    for (i = 0; i < count; i ++)
+        printf (COORDINATE_FORMAT, xvals [i], yvals [i]);
+}
+
+/**********************************************************/
+
+/**
  *  Calculates the value to add to the total area for the segment between
  *  the line from x1,y1 to x2,y2 and the x axis. The value returned by
  *  this function may be positive or negative.
@@ -199,6 +262,23 @@ distance_between (double x1, double y1, double x2, double y2)
 eccentricity (double perimeter, double area)
 {
     return (perimeter * perimeter) / area / (4.0 * PI);
+}
+
+/**********************************************************/
+
+/**
+ *  Copy the contents of the xval and yval arrays to specified locations.
+ */
+    void
+copy_global_coords_to (double *dest_xvals, double *dest_yvals, int count)
+{
+    int i;
+
+    for (i = 0; i < count; i ++)
+    {
+        dest_xvals [i] = saved_xvals [i];
+        dest_yvals [i] = saved_yvals [i];
+    }
 }
 
 /**********************************************************/
