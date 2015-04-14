@@ -152,8 +152,8 @@ read_next_polygon (int is_stage_1)
         y1 = y2;
     }
 
-    saved_xvals [i] = x2;
-    saved_yvals [i] = y2;
+    saved_xvals [i - 1] = x2;
+    saved_yvals [i - 1] = y2;
 
     /** lastly, add the section of perimeter and the area segment for the
      *  edge between the final point and the first point, closing the
