@@ -24,27 +24,40 @@
 
 /**********************************************************/
 
-void read_next_polygon (int is_stage_1);
+/**
+ *  Polygons are described by a sequence of coordinates in the two
+ *  dimensional cartesian plane.
+ */
+typedef struct
+{
+    double x, y;
+}
+vector_t;
+
+/**
+ *  A polygon itself has a list of vertices (corners) and also properties
+ *  of perimeter and area.
+ */
+typedef struct
+{
+    vector_t vertices [MAX_VERTICES];
+    double perimeter, area, eccentricity;
+    int npoints, id;
+}
+polygon_t;
+
+/**********************************************************/
+
+int read_next_polygon (polygon_t *p);
+void read_vertices (vector_t *buffer, int num_vertices);
+void print_stage_1 (polygon_t *p);
 void print_header (void);
 void print_footer (void);
 void print_row (int id, int nvals, double perimeter, double area);
 void print_stage_3 (int max_id, double *xvals, double *yvals, int count);
-double next_area_segment (double x1, double y1, double x2, double y2);
-double distance_between (double x1, double y1, double x2, double y2);
+double next_area_segment (vector_t *start, vector_t *end);
+double distance_between (vector_t *a, vector_t *b);
 double eccentricity (double perimeter, double area);
-void copy_global_coords_to (double *dest_xvals, double *dest_yvals, int count);
-
-/**********************************************************/
-
-/** 
- *  global variables for the perimeter, area, id and number of vertices of
- *  the last polygon that was read in. Global variables are best avoided,
- *  but in this case they provide a way of reducing the ammount of
- *  duplicated code.
- */
-double saved_perimeter, saved_area;
-int saved_id, saved_nvals;
-double saved_xvals [MAX_VERTICES], saved_yvals [MAX_VERTICES];
 
 /**********************************************************/
 
@@ -95,71 +108,24 @@ main (int argc, char **argv)
 /**********************************************************/
 
 /**
- *  Reads the next polygon from stdin and stores it's id, number of
- *  vertices, perimeter and area in the four corresponding global 
- *  variables.
+ *  Reads the next polygon data from stdin, and store the details in the
+ *  struct pointed to by p.
  *
- *  The param is a flag to indicate whether this function is to print
- *  stage 1 output, consisting of a list of the vertex coordinates.
+ *  If there are no more polygons to read, this function returns 0,
+ *  otherwise it returns 1.
  */
-    void
-read_next_polygon (int is_stage_1)
+    int
+read_next_polygon (polygon_t *p)
 {
-    int i;
-    double xi, yi;
-    double x1, y1, x2, y2;
+    /** First, read the number of points, and the id. */
+    if (scanf ("%d %d", &(p->npoints), &(p->id)) != 2)
+        return 0;
+    
+    /** next, read all of the vertices into the array inside the polygon
+     *  struct. */
+    read_vectors (&(p->vertices), p->npoints);
 
-    saved_perimeter = 0;
-    saved_area = 0;
-
-    /** if there are no more polygons to be read, we will get a single line
-     *  with nvals of 0 and no polygon id */
-    if (scanf ("%d %d", &saved_nvals, &saved_id) != 2)
-        return;
-
-    /** check that nvals is within the bounds given in the spec. */
-    if (saved_nvals > MAX_VERTICES)
-    {
-        printf ("Error: Too many vertices\n");
-        exit (1);
-    }
-
-    scanf ("%lf %lf", &xi, &yi);
-    x1 = xi;
-    y1 = yi;
-
-    if (is_stage_1)
-    {
-        printf ("\nStage 1\n=======\n");
-        printf ("First polygon is %d\n", saved_id);
-        printf ("   x_val    y_val\n");
-        printf (COORDINATE_FORMAT, xi, yi);
-    }
-
-    for (i = 1; i < saved_nvals; i ++)
-    {
-        scanf ("%lf %lf", &x2, &y2);
-        saved_perimeter += distance_between (x1, y1, x2, y2);
-        saved_area += next_area_segment (x1, y1, x2, y2);
-
-        if (is_stage_1)
-            printf (COORDINATE_FORMAT, x2, y2);
-
-        saved_xvals [i - 1] = x1;
-        saved_yvals [i - 1] = y1;
-
-        x1 = x2;
-        y1 = y2;
-    }
-
-    saved_xvals [i - 1] = x2;
-    saved_yvals [i - 1] = y2;
-
-    /** lastly, add the section of perimeter and the area segment for the
-     *  edge between the final point and the first point, closing the
-     *  loop. */
-    saved_perimeter += distance_between (x2, y2, xi, yi);
-    saved_area += next_area_segment (x2, y2, xi, yi);
+    return 1;
 }
 
 /**********************************************************/
@@ -224,18 +190,18 @@ print_stage_3 (int id, double *xvals, double *yvals, int count)
 
 /**
  *  Calculates the value to add to the total area for the segment between
- *  the line from x1,y1 to x2,y2 and the x axis. The value returned by
+ *  the line from start to end and the x axis. The value returned by
  *  this function may be positive or negative.
  */
     double
-next_area_segment (double x1, double y1, double x2, double y2)
+next_area_segment (vector_t *start, vector_t *end)
 {
     /** The edge of the polygon and the x axis form the boundaries of a
      *  trapezoid of area, where a and b are the two y values, and h is
      *  the difference in x values. A negative h indicates that the
      *  trapezoid is outside the polygon, and should be subtracted from
      *  the subtotal. */
-    return 0.5 * (y1 + y2) * (x2 - x1);
+    return 0.5 * (start->y + end->y) * (end->x - start->x);
 }
 
 /**********************************************************/
@@ -244,10 +210,11 @@ next_area_segment (double x1, double y1, double x2, double y2)
  *  Returns the distance between the two points (x1, y1) and (x2, y2).
  */
     double
-distance_between (double x1, double y1, double x2, double y2)
+distance_between (vector_t *a, vector_t *b)
 {
     double distance;
-    distance = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+    distance = (b->x - a->x) * (b->x - a->x) + 
+        (b->y - a->y) * (b->y - a->y);
     distance = sqrt (distance);
     return distance;
 }
@@ -262,23 +229,6 @@ distance_between (double x1, double y1, double x2, double y2)
 eccentricity (double perimeter, double area)
 {
     return (perimeter * perimeter) / area / (4.0 * PI);
-}
-
-/**********************************************************/
-
-/**
- *  Copy the contents of the xval and yval arrays to specified locations.
- */
-    void
-copy_global_coords_to (double *dest_xvals, double *dest_yvals, int count)
-{
-    int i;
-
-    for (i = 0; i < count; i ++)
-    {
-        dest_xvals [i] = saved_xvals [i];
-        dest_yvals [i] = saved_yvals [i];
-    }
 }
 
 /**********************************************************/
