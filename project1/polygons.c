@@ -120,7 +120,7 @@ print_stage_1 (const polygon_t *p)
     for (i = 0; i < p->npoints; i ++)
         printf (COORDINATE_FORMAT, p->vertices [i].x, p->vertices [i].y);
 
-    printf ("perimeter      = %5.1f m\n", p->perimeter);
+    printf ("perimeter      = %5.2f m\n", p->perimeter);
     printf ("area           = %5.2f m^2\n", p->area);
     printf ("eccentricity   = %5.2f\n", p->eccentricity);
 }
@@ -254,9 +254,9 @@ set_perimeter_and_area (polygon_t *p)
 
     /** finally, handle the segment from the last point back to the
      *  first. */
-    p->perimeter += distance_between (&(p->vertices [i]), 
+    p->perimeter += distance_between (&(p->vertices [i - 1]), 
       &(p->vertices [0]));
-    p->area += area_segment (&(p->vertices [i]), &(p->vertices [0]));
+    p->area += area_segment (&(p->vertices [i - 1]), &(p->vertices [0]));
 
     p->eccentricity = eccentricity (p->perimeter, p->area);
 }
