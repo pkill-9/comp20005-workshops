@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <assert.h>
 
 #define PI                      3.14159265358979323846
 
@@ -123,9 +124,26 @@ read_next_polygon (polygon_t *p)
     
     /** next, read all of the vertices into the array inside the polygon
      *  struct. */
-    read_vectors (&(p->vertices), p->npoints);
+    read_vertices (&(p->vertices), p->npoints);
 
     return 1;
+}
+
+/**********************************************************/
+
+/**
+ *  Read a given number of pairs of x and y coordinates from stdin and
+ *  store them in the given array.
+ */
+    void
+read_vertices (vector_t *buffer, int num_vertices)
+{
+    int i;
+
+    assert (num_vertices <= MAX_VERTICES);
+
+    for (i = 0; i < num_vertices; i ++)
+        scanf ("%lf %lf", &(buffer [i].x), &(buffer [i].y));
 }
 
 /**********************************************************/
