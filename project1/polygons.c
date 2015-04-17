@@ -57,7 +57,7 @@ void print_footer (void);
 void print_row (const polygon_t *p);
 void print_stage_3 (const polygon_t *max);
 void set_perimeter_and_area (polygon_t *p);
-double area_segment (vector_t *start, vector_t *end);
+double area_segment (const vector_t *start, const vector_t *end);
 double distance_between (const vector_t *a, const vector_t *b);
 double eccentricity (double perimeter, double area);
 void copy_polygon (const polygon_t *src, polygon_t *dest);
@@ -79,6 +79,7 @@ main (int argc, char **argv)
     /** Stage 2 is to step through all the polygons provided, and print out
      *  a table summarising the perimeter, area and eccentricity. */
     print_header ();
+    print_row (&current);
 
     while (read_next_polygon (&current) != 0)
     {
@@ -245,11 +246,17 @@ set_perimeter_and_area (polygon_t *p)
 
     for (i = 1; i < p->npoints; i ++)
     {
-        p->perimeter += distance_between (&(p->vertices [i]), 
-          &(p->vertices [i - 1]));
-        p->area += area_segment (&(p->vertices [i]), 
-          &(p->vertices [i - 1]));
+        p->perimeter += distance_between (&(p->vertices [i - 1]), 
+          &(p->vertices [i]));
+        p->area += area_segment (&(p->vertices [i - 1]), 
+          &(p->vertices [i]));
     }
+
+    /** finally, handle the segment from the last point back to the
+     *  first. */
+    p->perimeter += distance_between (&(p->vertices [i]), 
+      &(p->vertices [0]));
+    p->area += area_segment (&(p->vertices [i]), &(p->vertices [0]));
 
     p->eccentricity = eccentricity (p->perimeter, p->area);
 }
@@ -262,7 +269,7 @@ set_perimeter_and_area (polygon_t *p)
  *  this function may be positive or negative.
  */
     double
-area_segment (vector_t *start, vector_t *end)
+area_segment (const vector_t *start, const vector_t *end)
 {
     /** The edge of the polygon and the x axis form the boundaries of a
      *  trapezoid of area, where a and b are the two y values, and h is
