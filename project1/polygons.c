@@ -54,58 +54,74 @@ void read_vertices (vector_t *buffer, int num_vertices);
 void print_stage_1 (const polygon_t *p);
 void print_header (void);
 void print_footer (void);
-void print_row (int id, int nvals, double perimeter, double area);
-void print_stage_3 (int max_id, double *xvals, double *yvals, int count);
-double calculate_perimeter (const polygon_t *p);
-double calculate_area (const polygon_t *p)
-double next_area_segment (vector_t *start, vector_t *end);
+void print_row (const polygon_t *p);
+void print_stage_3 (const polygon_t *max);
+void set_perimeter_and_area (polygon_t *p);
+double area_segment (vector_t *start, vector_t *end);
 double distance_between (const vector_t *a, const vector_t *b);
 double eccentricity (double perimeter, double area);
+void copy_polygon (const polygon_t *src, polygon_t *dest);
 
 /**********************************************************/
 
     int
 main (int argc, char **argv)
 {
-    double biggest_xvals [MAX_VERTICES], biggest_yvals [MAX_VERTICES];
-    double max_area = 0;
-    int max_id, max_nvals;
+    polygon_t current, max;
 
-    /** read the first polygon for stage 1. */
-    read_next_polygon (STAGE_1);
+    /** Stage 1 is to read the first polygon and print out properties. */
+    read_next_polygon (&current);
+    print_stage_1 (&current);
 
+    /** max for stage 3 can be initialised with the first polygon. */
+    copy_polygon (&current, &max);
+
+    /** Stage 2 is to step through all the polygons provided, and print out
+     *  a table summarising the perimeter, area and eccentricity. */
     print_header ();
 
-    while (saved_nvals != 0)
+    while (read_next_polygon (&current) != 0)
     {
-        /** first print the row in the summary for the previous polygon,
-         *  then read the next set of vertices. */
-        print_row (saved_id, saved_nvals, saved_perimeter, saved_area);
-        read_next_polygon (!STAGE_1);
-
-        /** check if this polygon has the largest area. If so, save it's 
-         *  list points. */
-        if (saved_area >= max_area)
+        /** keep track of which polygon has the largest area for stage 3.
+         *  If two polygons have the same area, the polygon with the
+         *  smallest id is chosen as the max. */
+        if (current.area >= max.area)
         {
-            /** in cases of area ties, the polygon with the smallest id is
-             *  chosen. */
-            if (saved_area == max_area && max_id < saved_id)
-                continue;
-
-            max_area = saved_area;
-            max_id = saved_id;
-            max_nvals = saved_nvals;
-            copy_global_coords_to (biggest_xvals, biggest_yvals, max_nvals);
+            if (current.area != max.area || current.id < max.id)
+                copy_polygon (&current, &max);
         }
+
+        print_row (&current);
     }
 
     print_footer ();
 
-    /** Stage 3. Print out the coordinates of the polygon with the largest 
-     *  area. */
-    print_stage_3 (max_id, biggest_xvals, biggest_yvals, max_nvals);
+    print_stage_3 (&max);
 
     return 0;
+}
+
+/**********************************************************/
+
+/**
+ *  Stage 1. Prints out the coordinates of the given polygon, and also the
+ *  perimeter, area and eccentricity from the fields of the polygon struct.
+ */
+    void
+print_stage_1 (const polygon_t *p)
+{
+    int i;
+
+    printf ("Stage 1\n=======\n");
+    printf ("First polygon is %d\n", p->id);
+    printf ("   x_val   y_val\n");
+
+    for (i = 0; i < p->npoints; i ++)
+        printf (COORDINATE_FORMAT, p->vertices [i].x, p->vertices [i].y);
+
+    printf ("perimeter      = %5.1f m\n", p->perimeter);
+    printf ("area           = %5.2f m^2\n", p->area);
+    printf ("eccentricity   = %5.2f\n", p->eccentricity);
 }
 
 /**********************************************************/
@@ -126,12 +142,10 @@ read_next_polygon (polygon_t *p)
     
     /** next, read all of the vertices into the array inside the polygon
      *  struct. */
-    read_vertices (&(p->vertices), p->npoints);
+    read_vertices (p->vertices, p->npoints);
 
     /** Set the perimeter, area and eccentricity fields in the struct. */
-    p->perimeter = calculate_perimeter (p);
-    p->area = calculate_area (p);
-    p->eccentricity = calculate_eccentricity (p);
+    set_perimeter_and_area (p);
 
     return 1;
 }
@@ -186,10 +200,10 @@ print_footer (void)
  *  polygon; eccentricity can be calculated from the perimeter and area.
  */
     void
-print_row (int id, int nvals, double perimeter, double area)
+print_row (const polygon_t *p)
 {
-    printf ("| %5d | %5d | %5.2f | %5.2f | %5.2f |\n", id, nvals, perimeter,
-      area, eccentricity (perimeter, area));
+    printf ("| %5d | %5d | %5.2f | %5.2f | %5.2f |\n", p->id, p->npoints, 
+      p->perimeter, p->area, p->eccentricity);
 }
 
 /**********************************************************/
@@ -199,38 +213,45 @@ print_row (int id, int nvals, double perimeter, double area)
  *  coordinates of the largest polygon.
  */
     void
-print_stage_3 (int id, double *xvals, double *yvals, int count)
+print_stage_3 (const polygon_t *max)
 {
     int i;
 
     printf ("\nStage 3\n=======\n");
-    printf ("Largest polygon is %d\n", id);
+    printf ("Largest polygon is %d\n", max->id);
     printf ("   x_val    y_val\n");
 
-    for (i = 0; i < count; i ++)
-        printf (COORDINATE_FORMAT, xvals [i], yvals [i]);
+    for (i = 0; i < max->npoints; i ++)
+    {
+        printf (COORDINATE_FORMAT, max->vertices [i].x, 
+          max->vertices [i].y);
+    }
 }
 
 /**********************************************************/
 
 /**
- *  Given a polygon struct, calculate the perimeter from the array of
- *  vertex coordinates. For this function, it does not matter if the struct
- *  does not have the perimeter field correctly set.
+ *  Given a polygon with a list of points, calculate the perimeter, area
+ *  and eccentricity and store them in the respective fields of the polygon
+ *  struct.
  */
-    double
-calculate_perimeter (const polygon_t *p)
+    void
+set_perimeter_and_area (polygon_t *p)
 {
     int i;
-    double perimeter = 0;
+
+    p->perimeter = 0;
+    p->area = 0;
 
     for (i = 1; i < p->npoints; i ++)
     {
-        perimeter += distance_between (p->vertices [i], 
-          p->vertices [i - 1]);
+        p->perimeter += distance_between (&(p->vertices [i]), 
+          &(p->vertices [i - 1]));
+        p->area += area_segment (&(p->vertices [i]), 
+          &(p->vertices [i - 1]));
     }
 
-    return perimeter;
+    p->eccentricity = eccentricity (p->perimeter, p->area);
 }
 
 /**********************************************************/
@@ -241,7 +262,7 @@ calculate_perimeter (const polygon_t *p)
  *  this function may be positive or negative.
  */
     double
-next_area_segment (vector_t *start, vector_t *end)
+area_segment (vector_t *start, vector_t *end)
 {
     /** The edge of the polygon and the x axis form the boundaries of a
      *  trapezoid of area, where a and b are the two y values, and h is
@@ -276,6 +297,30 @@ distance_between (const vector_t *a, const vector_t *b)
 eccentricity (double perimeter, double area)
 {
     return (perimeter * perimeter) / area / (4.0 * PI);
+}
+
+/**********************************************************/
+
+/**
+ *  Copy the contents of the first polygon to the second one.
+ */
+    void
+copy_polygon (const polygon_t *src, polygon_t *dest)
+{
+    int i;
+
+    for (i = 0; i < src->npoints; i ++)
+    {
+        dest->vertices [i].x = src->vertices [i].x;
+        dest->vertices [i].y = src->vertices [i].y;
+    }
+
+    dest->perimeter = src->perimeter;
+    dest->area = src->area;
+    dest->eccentricity = src->eccentricity;
+
+    dest->npoints = src->npoints;
+    dest->id = src->id;
 }
 
 /**********************************************************/
