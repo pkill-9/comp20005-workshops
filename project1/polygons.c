@@ -51,13 +51,15 @@ polygon_t;
 
 int read_next_polygon (polygon_t *p);
 void read_vertices (vector_t *buffer, int num_vertices);
-void print_stage_1 (polygon_t *p);
+void print_stage_1 (const polygon_t *p);
 void print_header (void);
 void print_footer (void);
 void print_row (int id, int nvals, double perimeter, double area);
 void print_stage_3 (int max_id, double *xvals, double *yvals, int count);
+double calculate_perimeter (const polygon_t *p);
+double calculate_area (const polygon_t *p)
 double next_area_segment (vector_t *start, vector_t *end);
-double distance_between (vector_t *a, vector_t *b);
+double distance_between (const vector_t *a, const vector_t *b);
 double eccentricity (double perimeter, double area);
 
 /**********************************************************/
@@ -125,6 +127,11 @@ read_next_polygon (polygon_t *p)
     /** next, read all of the vertices into the array inside the polygon
      *  struct. */
     read_vertices (&(p->vertices), p->npoints);
+
+    /** Set the perimeter, area and eccentricity fields in the struct. */
+    p->perimeter = calculate_perimeter (p);
+    p->area = calculate_area (p);
+    p->eccentricity = calculate_eccentricity (p);
 
     return 1;
 }
@@ -207,6 +214,28 @@ print_stage_3 (int id, double *xvals, double *yvals, int count)
 /**********************************************************/
 
 /**
+ *  Given a polygon struct, calculate the perimeter from the array of
+ *  vertex coordinates. For this function, it does not matter if the struct
+ *  does not have the perimeter field correctly set.
+ */
+    double
+calculate_perimeter (const polygon_t *p)
+{
+    int i;
+    double perimeter = 0;
+
+    for (i = 1; i < p->npoints; i ++)
+    {
+        perimeter += distance_between (p->vertices [i], 
+          p->vertices [i - 1]);
+    }
+
+    return perimeter;
+}
+
+/**********************************************************/
+
+/**
  *  Calculates the value to add to the total area for the segment between
  *  the line from start to end and the x axis. The value returned by
  *  this function may be positive or negative.
@@ -228,7 +257,7 @@ next_area_segment (vector_t *start, vector_t *end)
  *  Returns the distance between the two points (x1, y1) and (x2, y2).
  */
     double
-distance_between (vector_t *a, vector_t *b)
+distance_between (const vector_t *a, const vector_t *b)
 {
     double distance;
     distance = (b->x - a->x) * (b->x - a->x) + 
