@@ -3,9 +3,12 @@
 # compile multiple files or anything.
 
 CC = gcc
-CFLAGS = -Wall -ansi
+CFLAGS = -Wall 
 
 polygons:		polygons.o
 	$(CC) $(CFLAGS) -o polygons polygons.o -lm
+
+random_input:		random_input.o
+	$(CC) $(CFLAGS) -o random_input random_input.o
 
 # vim: ts=8 sw=4 noet
