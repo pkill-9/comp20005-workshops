@@ -8,9 +8,9 @@
 
 /**********************************************************/
 
-void bubble_sort (int *array, int nitems);
+void bubble_sort (int array [], int nitems);
 void swap_ints (int *a, int *b);
-void print_array (int *array, int nitems);
+void print_array (int array [], int nitems);
 
 /**********************************************************/
 
@@ -44,7 +44,7 @@ main (int argc, char **argv)
  *  Sort the given array using bubblesort.
  */
     void
-bubble_sort (int *array, int nitems)
+bubble_sort (int array [], int nitems)
 {
     int didswaps = 1, i;
 
@@ -56,7 +56,7 @@ bubble_sort (int *array, int nitems)
         {
             if (array [i] > array [i + 1])
             {
-                swap_ints (array + i, array + i + 1);
+                swap_ints (&(array [i]), &(array [i + 1]));
                 didswaps = 1;
             }
         }
@@ -84,7 +84,7 @@ swap_ints (int *a, int *b)
  *  array.
  */
     void
-print_array (int *array, int nitems)
+print_array (int array [], int nitems)
 {
     int i;
 
