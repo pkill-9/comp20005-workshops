@@ -17,18 +17,15 @@ void print_array (int *array, int nitems);
     int
 main (int argc, char **argv)
 {
-    int length = 0, next_num;
+    int length = 0;
     int array [MAX_ITEMS];
 
     printf ("Enter as many as 10 numbers, ^D to end.\n");
 
     /** Read ints from stdin and put them into an array, careful not to
      *  write numbers past the end of the array. */
-    while ((scanf ("%d", &next_num) == 1) && length < MAX_ITEMS)
-    {
-        array [length] = next_num;
-        length ++;
-    }
+    while ((scanf ("%d", &(array [length ++])) == 1) && length < MAX_ITEMS)
+        ;
 
     printf ("Before:    ");
     print_array (array, length);
