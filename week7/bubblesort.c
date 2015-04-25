@@ -8,7 +8,7 @@
 
 /**********************************************************/
 
-void bubble_sort (int *array, int nitems);
+void bubble_sort (int *array, int *nitems);
 void swap_ints (int *a, int *b);
 void print_array (int *array, int nitems);
 
@@ -22,6 +22,8 @@ main (int argc, char **argv)
 
     printf ("Enter as many as 10 numbers, ^D to end.\n");
 
+    /** Read ints from stdin and put them into an array, careful not to
+     *  write numbers past the end of the array. */
     while ((scanf ("%d", &next_num) == 1) && length < MAX_ITEMS)
     {
         array [length] = next_num;
@@ -32,7 +34,7 @@ main (int argc, char **argv)
     print_array (array, length);
 
     printf ("After :    ");
-    bubble_sort (array, length);
+    bubble_sort (array, &length);
     print_array (array, length);
 
     return 0;
@@ -44,7 +46,7 @@ main (int argc, char **argv)
  *  Sort the given array using bubblesort.
  */
     void
-bubble_sort (int *array, int nitems)
+bubble_sort (int *array, int *nitems)
 {
     int didswaps = 1, i;
 
@@ -52,7 +54,7 @@ bubble_sort (int *array, int nitems)
     {
         didswaps = 0;
 
-        for (i = 0; i < nitems - 1; i ++)
+        for (i = 0; i < *nitems - 1; i ++)
         {
             /** compare two consecutive values in the array. If they are
              *  not in the correct order, swap them so that they are in the
@@ -68,7 +70,8 @@ bubble_sort (int *array, int nitems)
              *  item in the array, and decreasing nitems. */
             if (array [i] == array [i + 1])
             {
-                swap_ints (&(array [i]), &(array [i + 1]));
+                swap_ints (&(array [i]), &(array [*nitems - 1]));
+                *nitems -= 1;
                 didswaps = 1;
             }
         }
