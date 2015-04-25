@@ -10,7 +10,7 @@
 
 void bubble_sort (int *array, int *nitems);
 void swap_ints (int *a, int *b);
-void print_array (int *array, int nitems);
+void print_array (int array [], int nitems);
 
 /**********************************************************/
 
@@ -58,7 +58,7 @@ bubble_sort (int *array, int *nitems)
              *  right order. */
             if (array [i] < array [i + 1])
             {
-                swap_ints (array + i, array + i + 1);
+                swap_ints (&(array [i]), &(array [i + 1]));
                 didswaps = 1;
             }
 
@@ -96,7 +96,7 @@ swap_ints (int *a, int *b)
  *  array.
  */
     void
-print_array (int *array, int nitems)
+print_array (int array [], int nitems)
 {
     int i;
 
