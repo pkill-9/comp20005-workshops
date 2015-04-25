@@ -54,9 +54,21 @@ bubble_sort (int *array, int nitems)
 
         for (i = 0; i < nitems - 1; i ++)
         {
+            /** compare two consecutive values in the array. If they are
+             *  not in the correct order, swap them so that they are in the
+             *  right order. */
             if (array [i] < array [i + 1])
             {
                 swap_ints (array + i, array + i + 1);
+                didswaps = 1;
+            }
+
+            /** Remove duplicates. If two consecutive values are equal, we
+             *  will remove the rightmost one by swapping it with the last
+             *  item in the array, and decreasing nitems. */
+            if (array [i] == array [i + 1])
+            {
+                swap_ints (&(array [i]), &(array [i + 1]));
                 didswaps = 1;
             }
         }
