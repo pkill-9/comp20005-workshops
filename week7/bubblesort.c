@@ -54,7 +54,7 @@ bubble_sort (int *array, int nitems)
 
         for (i = 0; i < nitems - 1; i ++)
         {
-            if (array [i] > array [i + 1])
+            if (array [i] < array [i + 1])
             {
                 swap_ints (array + i, array + i + 1);
                 didswaps = 1;
