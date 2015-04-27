@@ -27,6 +27,8 @@ main (int argc, char **argv)
     while ((scanf ("%d", &(array [length ++])) == 1) && length < MAX_ITEMS)
         ;
 
+    length -= 1;
+
     printf ("Before:    ");
     print_array (array, length);
 
