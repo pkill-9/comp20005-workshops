@@ -5,29 +5,28 @@
 
 #include <stdio.h>
 
-#define MAX_NUMBERS     1000
+#define NR_BUCKETS      1000
 
 /**********************************************************/
 
-void bubble_sort (int *array, int nitems);
-void swap_ints (int *a, int *b);
-void print_histogram (int *numbers, int length);
+void clear_histogram (int *buckets, int length);
+void print_histogram (const int *buckets, int length);
 
 /**********************************************************/
 
     int
 main (int argc, char **argv)
 {
-    int numbers [MAX_NUMBERS];
-    int i = 0;
+    int histogram [NR_BUCKETS];
+    int number;
 
-    printf ("Enter up to %d numbers, ^D to end\n", MAX_NUMBERS);
+    printf ("Enter numbers between 0 and %d, ^D to end\n", NR_BUCKETS);
+    clear_histogram (histogram, NR_BUCKETS);
 
-    while ((scanf ("%d", &(numbers [i])) == 1) && i < MAX_NUMBERS)
-        i ++;
+    while (scanf ("%d", &number) == 1) 
+        histogram [number] += 1;
 
-    bubble_sort (numbers, i);
-    print_histogram (numbers, i);
+    print_histogram (histogram, NR_BUCKETS);
 
     return 0;
 }
@@ -35,82 +34,36 @@ main (int argc, char **argv)
 /**********************************************************/
 
 /**
- *  Sort the given array using bubblesort.
+ *  Steps through the given array and sets all the values to 0.
  */
     void
-bubble_sort (int *array, int nitems)
+clear_histogram (int *buckets, int length)
 {
-    int didswaps = 1, i;
+    int i;
 
-    while (didswaps)
-    {
-        didswaps = 0;
-
-        for (i = 0; i < nitems - 1; i ++)
-        {
-            if (array [i] > array [i + 1])
-            {
-                swap_ints (array + i, array + i + 1);
-                didswaps = 1;
-            }
-        }
-    }
+    for (i = 0; i < length; i ++)
+        buckets [i] = 0;
 }
 
 /**********************************************************/
 
 /**
- *  Swap the two ints pointed to by the two arguments.
+ *  Given a list of n ints where the ith int is the number of occurences
+ *  of the value i in the input, prints out how many times each distinct
+ *  value occurrs.
  */
     void
-swap_ints (int *a, int *b)
+print_histogram (const int *buckets, int length)
 {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
-/**********************************************************/
-
-/**
- *  Function that, given a sorted array, prints out each distinct value,
- *  and the number of times each value occurrs.
- */
-    void
-print_histogram (int *numbers, int length)
-{
-    int previous_value = 0, i, nr_occurences = 1;
+    int i;
 
     printf ("value      frequency\n");
 
-    /** if a value occurrs more than once, the repeat values will be all
-     *  clustered together, so we can just count them. */
     for (i = 0; i < length; i ++)
     {
-        /** the first item has no previous value. */
-        if (i != 0)
-        {
-            /** is this value the same as the previous? If so, increment
-             *  the number of occurences. */
-            if (numbers [i] != previous_value)
-            {
-                printf ("%4d %10d\n", previous_value, nr_occurences);
-                previous_value = numbers [i];
-                nr_occurences = 1;
-            }
-            else
-            {
-                nr_occurences += 1;
-            }
-        }
-        else
-        {
-            previous_value = numbers [i];
-            nr_occurences = 1;
-        }
+        if (buckets [i] != 0)
+            printf ("%4d %10d\n", i, buckets [i]);
     }
-
-    printf ("%4d %10d\n", previous_value, nr_occurences);
 }
 
 /**********************************************************/
