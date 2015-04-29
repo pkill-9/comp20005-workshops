@@ -1,0 +1,127 @@
+\documentclass{beamer}
+
+\usetheme{Frankfurt}
+
+\title{Workshop 7 -- More Arrays}
+\author{COMP20005 Engineering Computation}
+\institute{The University of Melbourne}
+
+\begin{document}
+
+\renewcommand{\tt}[1]{\texttt{#1}}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Contact Info}
+    \begin{itemize}
+        \item Matt Signorini
+        \item Email: \tt{msignorini@unimelb.edu.au}
+        \item Also LMS discussion forum for help
+        \item My workshop solutions available at \url{https://github.com/pkill-9/comp20005-workshops/}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Today's Workshop}
+    \begin{block}{Agenda}
+        By the end of this class, you should:
+        \begin{itemize}
+            \item Have a solid understanding of arrays in C.
+            \item Be able to use arrays to solve a problem.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\section{Exercise: 7.6}
+\stepcounter{subsection}
+
+\begin{frame}{7.6}
+    An alternative sorting algorithm is to locate the largest value in the
+    array and swap it to the last position, then repeat the process with
+    the values that have not been swapped. This algorithm is known as
+    \emph{selection sort}
+
+    Write a function \tt{void selection\_sort (int a [], int n)} that sorts
+    the array \tt{a} using the above algorithm.
+\end{frame}
+
+\section{Exercise: 3.6}
+\stepcounter{subsection}
+
+\begin{frame}{3.6 Revisited}
+    In the lab in week 3, you created a program to list the
+    coins required to make up a specified value. You may recall hints that
+    there was a much more elegant solution than one implemented solely with
+    if constructs. How would you write this program differently, given your 
+    new knowledge of arrays?
+\end{frame}
+
+\section{Lab Exercises}
+\stepcounter{subsection}
+
+\begin{frame}{Exercises}
+    \begin{block}{Problems}
+        \begin{itemize}
+            \item[7.4] program to print a histogram of int values.
+            \item[7.7] write a function that returns the most commonly
+                occurring value in an array of ints.
+            \item[7.15] write a function that tests if two words are
+                anagrams (7.16 in the old textbook edition).
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+%
+%  _________________________________________
+% / The primary purpose of the DATA         \
+% | statement is to give names to           |
+% | constants; instead of referring to pi   |
+% | as 3.141592653589793 at every           |
+% | appearance, the variable PI can be      |
+% | given that value with a DATA statement  |
+% | and used instead of the longer form of  |
+% | the constant. This also simplifies      |
+% | modifying the program, should the value |
+% | of pi change.                           |
+% |                                         |
+% \ -- FORTRAN manual for Xerox Computers   /
+%  -----------------------------------------
+%  \                   .,
+%    \         .      .TR   d'
+%      \      k,l    .R.b  .t .Je
+%        \   .P q.   a|.b .f .Z%		
+%            .b .h  .E` # J: 2`     .
+%       .,.a .E  ,L.M'  ?:b `| ..J9!`.,
+%        q,.h.M`   `..,   ..,""` ..2"`
+%        .M, J8`   `:       `   3;
+%    .    Jk              ...,   `^7"90c.
+%     j,  ,!     .7"'`j,.|   .n.   ...
+%    j, 7'     .r`     4:      L   `...
+%   ..,m.      J`    ..,|..    J`  7TWi
+%   ..JJ,.:    %    oo      ,. ....,
+%     .,E      3     7`g.M:    P  41
+%    JT7"'      O.   .J,;     ``  V"7N.
+%    G.           ""Q+  .Zu.,!`      Z`
+%    .9.. .         J&..J!       .  ,:
+%       7"9a                    JM"!
+%          .5J.     ..        ..F`
+%             78a..   `    ..2'
+%                 J9Ksaw0"'
+%                .EJ?A...a.
+%                q...g...gi
+%               .m...qa..,y:
+%               .HQFNB&...mm
+%                ,Z|,m.a.,dp
+%             .,?f` ,E?:"^7b
+%             `A| . .F^^7'^4,
+%              3.MMMMMMMMMMMQzna,
+%          ...f"A.JdT     J:    Jp,
+%           `JNa..........A....af`
+%                `^^^^^'`
+%
+
+
+\end{document}
+
+% vim: ft=tex ts=4 sw=4 lbr et
