@@ -36,13 +36,18 @@ main (int argc, char **argv)
     void
 selection_sort (int a[], int length)
 {
-    int lastpos, maxindex;
+    int maxindex;
 
-    for (lastpos = length - 1; lastpos >= 0; lastpos --)
-    {
-        maxindex = find_max (a, length);
-        swap_ints (a + maxindex, a + length - 1);
-    }
+    /** An array of length 1 is implicitly sorted, since it cannot be in
+     *  the wrong order. In that case, we have nothing more to do. */
+    if (length == 1)
+        return;
+
+    /** For longer arrays, we need to find the largest value, swap it to
+     *  the end, then sort the remaining unsorted values. */
+    maxindex = find_max (a, length);
+    swap_ints (a + maxindex, a + length - 1);
+    selection_sort (a, length - 1);
 }
 
 /**********************************************************/
