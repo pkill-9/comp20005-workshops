@@ -3,13 +3,16 @@
 CC=gcc
 CFLAGS=-Wall -ansi
 
-all:		freq popular ssort listchange
+all:		freq popular anagram ssort listchange
 
 freq:		histogram.o
 	$(CC) $(CFLAGS) -o freq histogram.o
 
 popular:	popular.o
 	$(CC) $(CFLAGS) -o popular popular.o
+
+anagram:	anagram.o
+	$(CC) $(CFLAGS) -o anagram anagram.o
 
 ssort:		selection_sort.o
 	$(CC) $(CFLAGS) -o ssort selection_sort.o
