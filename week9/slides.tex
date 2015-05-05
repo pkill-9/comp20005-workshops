@@ -1,0 +1,96 @@
+\documentclass{beamer}
+
+\usetheme{Frankfurt}
+
+\title{Workshop 8 -- Structs}
+\author{COMP20005 Engineering Computation}
+\institute{The University of Melbourne}
+
+\begin{document}
+
+\renewcommand{\tt}[1]{\texttt{#1}}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Contact Info}
+    \begin{itemize}
+        \item Matt Signorini
+        \item Email: \tt{msignorini@unimelb.edu.au}
+        \item Also LMS discussion forum for help
+        \item My workshop solutions available at \url{https://github.com/pkill-9/comp20005-workshops/}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Today's Workshop}
+    \begin{block}{Agenda}
+        By the end of this class, you should:
+        \begin{itemize}
+            \item Understand the difference between a struct definition
+                and a variable declaration.
+            \item Be able to design simple structs to encapsulate a group
+                of related variables.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\section{Exercise: 8.2}
+\stepcounter{subsection}
+
+\begin{frame}{8.2 -- Vectors}
+    Define a structure \tt{vector\_t} that stores (x,y) coordinates.
+    Then write a function \tt{float distance(vector\_t p1, vector\_t p2)}
+    that returns the distance between the two points, using Pythagoras'
+    formula:
+    \begin{equation}
+        \sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2}
+    \end{equation}
+\end{frame}
+
+\section{Exercise: 8.5}
+\stepcounter{subsection}
+
+\begin{frame}{8.5 -- Complex numbers}
+    Define a structure for storing complex numbers, each with a real and
+    imaginary part, both of type \tt{double}.
+
+    Then write functions to add and multiply complex numbers using your
+    struct.
+\end{frame}
+
+\section{Lab Exercises}
+\stepcounter{subsection}
+
+\begin{frame}{Exercises}
+    \begin{block}{Problems}
+        \begin{itemize}
+            \item[8.3] Define a polygon struct, and function to calculate
+                perimeter.
+            \item[8.4] Using the same polygon struct, write a function to
+                calculate area.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+%
+%  ____________________________________
+% / As of next week, passwords will be \
+% \ entered in Morse code.             /
+%  ------------------------------------
+%   \            .    .     .   
+%    \      .  . .     `  ,     
+%     \    .; .  : .' :  :  : . 
+%      \   i..`: i` i.i.,i  i . 
+%       \   `,--.|i |i|ii|ii|i: 
+%            UooU\.'@@@@@@`.||' 
+%            \__/(@@@@@@@@@@)'  
+%                 (@@@@@@@@)    
+%                 `YY~~~~YY'    
+%                  ||    ||     
+%
+
+
+\end{document}
+
+% vim: ft=tex ts=4 sw=4 lbr et
