@@ -239,26 +239,20 @@ print_stage_3 (const polygon_t *max)
     void
 set_perimeter_and_area (polygon_t *p)
 {
-    int i;
+    int current, previous = p->npoints - 1;
 
     p->perimeter = 0;
     p->area = 0;
 
-    for (i = 1; i < p->npoints; i ++)
+    for (current = 1; current < p->npoints; current ++)
     {
-        p->perimeter += distance_between (&(p->vertices [i - 1]), 
-          &(p->vertices [i]));
-        p->area += area_segment (&(p->vertices [i - 1]), 
-          &(p->vertices [i]));
+        p->perimeter += distance_between (&(p->vertices [previous]), 
+          &(p->vertices [current]));
+        p->area += area_segment (&(p->vertices [previous]), 
+          &(p->vertices [current]));
+
+        previous = current;
     }
-
-    /** finally, handle the segment from the last point back to the
-     *  first. */
-    p->perimeter += distance_between (&(p->vertices [i - 1]), 
-      &(p->vertices [0]));
-    p->area += area_segment (&(p->vertices [i - 1]), &(p->vertices [0]));
-
-    p->eccentricity = eccentricity (p->perimeter, p->area);
 }
 
 /**********************************************************/
