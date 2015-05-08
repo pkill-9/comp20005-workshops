@@ -421,6 +421,9 @@ do_averge(csv_t *D, int col) {
     int row;
     double sum = 0;
 
+    /* column index begins at 1 from the users perspective */
+    col -= 1;
+
     for (row = 0; row < D->nrows; row ++)
         sum += D->vals [row] [col];
 
