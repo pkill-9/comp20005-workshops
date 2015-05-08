@@ -413,10 +413,20 @@ do_datdmp(csv_t *D) {
 
 /****************************************************************/
 
-/* implement the 'a' averaging command
-*/
+/**
+ *  Computes the average down a given column of the data.
+ */
 void
 do_averge(csv_t *D, int col) {
+    int row;
+    double sum = 0;
+
+    for (row = 0; row < D->nrows; row ++)
+        sum += D->vals [row] [col];
+
+    printf ("average %s is %5.2f (over %d values)\n", D->labs [col], 
+      sum / row, row);
+
 	return;
 }
 
