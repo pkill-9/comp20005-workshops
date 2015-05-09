@@ -46,6 +46,8 @@
 #define FILINP	1	/* indicates command input coming from a file */
 #define PROMPT	"> "
 
+#define NUMBUCKETS 20   /* number of divisions for the graph in stage 2 */
+
 /****************************************************************/
 
 /* structure declarations -- probably no need to change these,
@@ -67,6 +69,15 @@ typedef struct {
 	int argvals[MAXARGS];
 } command_t;
 
+/**
+ *  This structure is used to build the histogram for stage 2.
+ */
+typedef struct {
+    double upper;
+    double lower;
+    int nitems;
+} bucket_t;
+
 /****************************************************************/
 
 /* function prototypes */
@@ -83,6 +94,13 @@ void    do_graph1(csv_t *D, int col);
 void    do_catavg(csv_t *D, int cat, int col);
 void    do_kndall(csv_t *D, int col1, int col2);
 void    do_graph2(csv_t *D, int col1, int col2);
+
+void init_buckets (const csv_t *data, int col, bucket_t *buckets);
+void add_to_buckets (bucket_t *buckets, double value);
+void print_histogram (const csv_t *data, const bucket_t *buckets, int col);
+void print_bar (int length);
+double getmax (const csv_t *data, int col);
+double getmin (const csv_t *data, int col);
 
 /****************************************************************/
 
@@ -435,10 +453,22 @@ do_averge(csv_t *D, int col) {
 
 /****************************************************************/
 
-/* implement the 'g' graphing command
-*/
+/**
+ *  Implement the 'g' graphing command. Plots a histogram of the data.
+ */
 void
 do_graph1(csv_t *D, int col) {
+    bucket_t buckets [NUMBUCKETS];
+    int row;
+
+    init_buckets (D, col, buckets);
+
+    for (row = 0; row < D->nrows; row ++) {
+        add_to_buckets (buckets, D->vals [row] [col]);
+    }
+
+    print_histogram (D, buckets, col);
+
 	return;
 }
 
@@ -471,3 +501,120 @@ do_graph2(csv_t *D, int col1, int col2) {
 	return;
 }
 
+/****************************************************************/
+
+/**
+ *  Initialise the buckets array which is used to produce the histogram in
+ *  stage 2. This function will set the upper and lower limits of each
+ *  bucket in the array to cover the range of the data, and will set all
+ *  the counts to zero.
+ */
+void
+init_buckets (const csv_t *data, int col, bucket_t *buckets) {
+    double min = getmin (data, col) - EPSILON;
+    double max = getmax (data, col) + EPSILON;
+    double increment = (max - min) / NUMBUCKETS;
+    int i;
+
+    for (i = 0; i < NUMBUCKETS; i ++) {
+        buckets [i].lower = min + increment * i;
+        buckets [i].upper = buckets [i].lower + increment;
+        buckets [i].nitems = 0;
+    }
+}
+
+/****************************************************************/
+
+/**
+ *  Increments the items count for the bucket corresponding to the given
+ *  value.
+ */
+void
+add_to_buckets (bucket_t *buckets, double value) {
+    int i;
+
+    for (i = 0; i < NUMBUCKETS; i ++) {
+        if (value > buckets [i].lower && value < buckets [i].upper) {
+            buckets [i].nitems += 1;
+            return;
+        }
+    }
+}
+
+/****************************************************************/
+
+/**
+ *  Prints the output for stage 2; a histogram of the data down a given
+ *  column.
+ */
+void
+print_histogram (const csv_t *data, const bucket_t *buckets, int col)
+{
+    int row;
+
+    printf ("graph of %s scaled by a factor of 1\n", data->labs [col]);
+
+    for (row = 0; row < NUMBUCKETS; row ++) {
+        printf ("%5.2f -- %5.2f [%4d]:", buckets [row].lower, 
+          buckets [row].upper, buckets [row].nitems);
+        print_bar (buckets [row].nitems);
+    }
+}
+
+/****************************************************************/
+
+/**
+ *  Prints a bar of the histogram for stage 2, with a newline at the end.
+ */
+void
+print_bar (int length)
+{
+    for (; length > 0; length -= 1)
+        printf ("*");
+
+    printf ("\n");
+}
+
+/****************************************************************/
+
+/**
+ *  Get the maximum down a given row of the data.
+ */
+double
+getmax (const csv_t *data, int col)
+{
+    double max = data->vals [0] [col];
+    int row;
+
+    for (row = 0; row < data->nrows; row ++) {
+        if (data->vals [row] [col] > max) {
+            max = data->vals [row] [col];
+        }
+    }
+
+    return max;
+}
+
+/****************************************************************/
+
+/**
+ *  Similarly for the min down a row.
+ */
+double
+getmin (const csv_t *data, int col)
+{
+    double min = data->vals [0] [col];
+    int row;
+
+    for (row = 0; row < data->nrows; row ++) {
+        if (data->vals [row] [col] > min) {
+            min = data->vals [row] [col];
+        }
+    }
+
+    return min;
+}
+
+/****************************************************************/
+
+/** vim: set ts=4 sw=4 et : */
