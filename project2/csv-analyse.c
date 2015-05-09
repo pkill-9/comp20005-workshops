@@ -461,6 +461,9 @@ do_graph1(csv_t *D, int col) {
     bucket_t buckets [NUMBUCKETS];
     int row;
 
+    /* col index starts at 1 for users. */
+    col -= 1;
+
     init_buckets (D, col, buckets);
 
     for (row = 0; row < D->nrows; row ++) {
@@ -607,7 +610,7 @@ getmin (const csv_t *data, int col)
     int row;
 
     for (row = 0; row < data->nrows; row ++) {
-        if (data->vals [row] [col] > min) {
+        if (data->vals [row] [col] < min) {
             min = data->vals [row] [col];
         }
     }
