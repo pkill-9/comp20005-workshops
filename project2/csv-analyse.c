@@ -666,7 +666,7 @@ insert_into_categories (category_t *c, int numcats, double id, double val) {
     c [index].count += 1;
 
     /* keep the category array sorted. */
-    while (previndex > 0 && c [index].id < c [previndex].id) {
+    while (previndex >= 0 && c [index].id < c [previndex].id) {
         swap_categories (c + index, c + previndex);
         index --;
         previndex --;
