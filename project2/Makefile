@@ -11,4 +11,9 @@ csv-analyse:		csv-analyse.o
 random_input:		random_input.o
 	$(CC) $(CFLAGS) -o random_input random_input.o
 
+tags:
+	cscope -b
+
+.PHONY:			tags
+
 # vim: ts=8 sw=4 noet

@@ -78,6 +78,16 @@ typedef struct {
     int nitems;
 } bucket_t;
 
+/**
+ *  Structure to contain data about categories. To compute the average, we
+ *  need to know how many items in the category and what they sum to.
+ */
+typedef struct {
+    double id;
+    double sum;
+    int count;
+} category_t;
+
 /****************************************************************/
 
 /* function prototypes */
@@ -101,6 +111,12 @@ void print_histogram (const csv_t *data, const bucket_t *buckets, int col);
 void print_bar (int length);
 double getmax (const csv_t *data, int col);
 double getmin (const csv_t *data, int col);
+
+int insert_into_categories (category_t *c, int numcats, double id, 
+  double value);
+int get_category (category_t *c, int *numcats, double id);
+void print_categories (category_t *c, int numcats);
+void swap_categories (category_t *c1, category_t *c2);
 
 /****************************************************************/
 
@@ -477,11 +493,27 @@ do_graph1(csv_t *D, int col) {
 
 /****************************************************************/
 
-/* implement the 'c' category average command
-*/
+/**
+ *  Compute the average of the values in multiple categories. The cat
+ *  parameter is the column index of the category labels, and col is the
+ *  column of the data to be averaged.
+ */
 void
-do_catavg(csv_t *D, int cat, int col) {
-	return;
+do_catavg(csv_t *d, int cat, int col) {
+    category_t counts [MAXCATS];
+    int row, numcats = 0;
+
+    cat -= 1;
+    col -= 1;
+
+    for (row = 0; row < d->nrows; row ++) {
+        numcats = insert_into_categories (counts, numcats, 
+          d->vals [row] [cat], d->vals [row] [col]);
+    }
+
+    /* print header for stage 3 */
+    printf ("%s     average %s\n", d->labs [cat], d->labs [col]);
+    print_categories (counts, numcats);
 }
 
 /****************************************************************/
@@ -551,8 +583,7 @@ add_to_buckets (bucket_t *buckets, double value) {
  *  column.
  */
 void
-print_histogram (const csv_t *data, const bucket_t *buckets, int col)
-{
+print_histogram (const csv_t *data, const bucket_t *buckets, int col) {
     int row;
 
     printf ("graph of %s scaled by a factor of 1\n", data->labs [col]);
@@ -570,8 +601,7 @@ print_histogram (const csv_t *data, const bucket_t *buckets, int col)
  *  Prints a bar of the histogram for stage 2, with a newline at the end.
  */
 void
-print_bar (int length)
-{
+print_bar (int length) {
     for (; length > 0; length -= 1)
         printf ("*");
 
@@ -584,8 +614,7 @@ print_bar (int length)
  *  Get the maximum down a given row of the data.
  */
 double
-getmax (const csv_t *data, int col)
-{
+getmax (const csv_t *data, int col) {
     double max = data->vals [0] [col];
     int row;
 
@@ -604,8 +633,7 @@ getmax (const csv_t *data, int col)
  *  Similarly for the min down a row.
  */
 double
-getmin (const csv_t *data, int col)
-{
+getmin (const csv_t *data, int col) {
     double min = data->vals [0] [col];
     int row;
 
@@ -616,6 +644,95 @@ getmin (const csv_t *data, int col)
     }
 
     return min;
+}
+
+/****************************************************************/
+
+/**
+ *  Search through the category array for a category matching id, and if
+ *  found, add the specified value to its sum. If the category does not
+ *  exist, this function will create a new category, setting its initial
+ *  sum to zero.
+ *
+ *  Return value is the length of the category array, which may be 1 unit
+ *  larger if a new category is added.
+ */
+int
+insert_into_categories (category_t *c, int numcats, double id, double val) {
+    int index = get_category (c, &numcats, id);
+    int previndex = index - 1;
+
+    c [index].sum += val;
+    c [index].count += 1;
+
+    /* keep the category array sorted. */
+    while (previndex > 0 && c [index].id < c [previndex].id) {
+        swap_categories (c + index, c + previndex);
+        index --;
+        previndex --;
+    }
+
+    return numcats;
+}
+
+/****************************************************************/
+
+/**
+ *  Searches the category array for a matching id. If found, this function
+ *  returns the index of the matching id. Otherwise, a new category struct
+ *  will be initialised (sum = 0, count = 0) and the index of the new
+ *  category will be returned.
+ */
+int
+get_category (category_t *c, int *numcats, double id) {
+    int i, found = 0;
+
+    for (i = 0; i < *numcats; i ++) {
+        if (c [i].id == id) {
+            found = 1;
+            break;
+        }
+    }
+
+    /* check to see if we found a matching category */
+    if (found == 0) {
+        c [i].sum = 0;
+        c [i].count = 0;
+        c [i].id = id;
+
+        /* we have added a category, so increase the length of the array */
+        *numcats += 1;
+    }
+
+    return i;
+}
+
+/****************************************************************/
+
+/**
+ *  Print output for stage 3, consisting of each category value, and the
+ *  average of the values in that category.
+ */
+void
+print_categories (category_t *cats, int numcats) {
+    int i;
+
+    for (i = 0; i < numcats; i ++) {
+        printf ("%8.2f %10.2f (over %d values)\n", cats [i].id,
+          cats [i].sum / cats [i].count, cats [i].count);
+    }
+}
+
+/****************************************************************/
+
+/**
+ *  Swap two category structs.
+ */
+void
+swap_categories (category_t *c1, category_t *c2) {
+    category_t temp = *c1;
+    *c1 = *c2;
+    *c2 = temp;
 }
 
 /****************************************************************/
