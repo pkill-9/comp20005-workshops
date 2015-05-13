@@ -1,4 +1,6 @@
 
+all:			slides.pdf
+
 # target to build slides from LaTeX code.
 slides.out:		slides.tex
 	pdflatex slides.tex
@@ -13,7 +15,7 @@ clean:
 scrub:			clean
 	rm slides.pdf
 
-.PHONY:			clean scrub
+.PHONY:			all clean scrub
 
 
 # vim: ts=8 sw=4 noet
