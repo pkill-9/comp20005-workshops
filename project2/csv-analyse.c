@@ -118,6 +118,8 @@ int get_category (category_t *c, int *numcats, double id);
 void print_categories (category_t *c, int numcats);
 void swap_categories (category_t *c1, category_t *c2);
 
+int isconcordant (const csv_t *data, int row, int col1, int col2);
+
 /****************************************************************/
 
 /* main program controls all the action
@@ -518,12 +520,35 @@ do_catavg(csv_t *d, int cat, int col) {
 
 /****************************************************************/
 
-/* implement the 'k' command to compute Kendall's tau-b
-   coefficient for similarity between two sets of paired values
-*/
+/**
+ *  Calculates Kendall's tau correlation for two given columns in the
+ *  data.
+ */
 void   
-do_kndall(csv_t *D, int col1, int col2) {
-	return;
+do_kndall(csv_t *d, int col1, int col2) {
+    int concordant = 0, disconcordant = 0;
+    int row;
+    double tau;
+    double total = 0;
+
+    col1 --;
+    col2 --;
+
+    for (row = 0; row < d->nrows - 1; row ++) {
+        if (isconcordant (d, row, col1, col2)) {
+            concordant ++;
+        } else {
+            disconcordant ++;
+        }
+        
+        total ++;
+    }
+
+    assert (total != 0);
+    tau = 2.0 * (concordant - disconcordant) / (total * (total - 1));
+
+    printf ("tau coefficient between %s and %s = %6.2f\n", d->labs [col1],
+      d->labs [col2], tau);
 }
 
 /****************************************************************/
@@ -534,6 +559,25 @@ do_kndall(csv_t *D, int col1, int col2) {
 void   
 do_graph2(csv_t *D, int col1, int col2) {
 	return;
+}
+
+/****************************************************************/
+
+/**
+ *  This function is used in the process of calculating Kendall's 
+ *  coefficient. For the given dataset, this function returns true if
+ *  row and row+1 are concordant. Rows are concordant if the values in the
+ *  specified two columns are in the same order in both rows.
+ */
+int
+isconcordant (const csv_t *data, int row, int col1, int col2) {
+    assert (row >= 0 && row < data->nrows - 1);
+
+    /* either col1 is less than col2 in both rows, or col1 is greater than
+     * col2 in both rows. This can be expressed using the exclusive or
+     * operation. */
+    return ! (data->vals [row] [col1] > data->vals [row] [col2]) ^
+        (data->vals [row + 1] [col1] > data->vals [row + 1] [col2]);
 }
 
 /****************************************************************/
