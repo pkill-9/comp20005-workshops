@@ -118,7 +118,8 @@ int get_category (category_t *c, int *numcats, double id);
 void print_categories (category_t *c, int numcats);
 void swap_categories (category_t *c1, category_t *c2);
 
-int isconcordant (const csv_t *data, int row, int col1, int col2);
+int isconcordant (const csv_t *data, int row1, int row2, int col1, 
+  int col2);
 
 /****************************************************************/
 
@@ -527,25 +528,24 @@ do_catavg(csv_t *d, int cat, int col) {
 void   
 do_kndall(csv_t *d, int col1, int col2) {
     int concordant = 0, disconcordant = 0;
-    int row;
+    int i, j;
     double tau;
-    double total = 0;
 
     col1 --;
     col2 --;
 
-    for (row = 0; row < d->nrows - 1; row ++) {
-        if (isconcordant (d, row, col1, col2)) {
-            concordant ++;
-        } else {
-            disconcordant ++;
+    for (i = 0; i < d->nrows; i ++) {
+        for (j = i + 1; j < d->nrows; j ++) {
+            if (isconcordant (d, i, j, col1, col2)) {
+                concordant ++;
+            } else {
+                disconcordant ++;
+            }
         }
-        
-        total ++;
     }
 
-    assert (total != 0);
-    tau = 2.0 * (concordant - disconcordant) / (total * (total - 1));
+    tau = 2.0 * (concordant - disconcordant) / 
+        (d->nrows * (d->nrows - 1));
 
     printf ("tau coefficient between %s and %s = %6.2f\n", d->labs [col1],
       d->labs [col2], tau);
@@ -570,14 +570,12 @@ do_graph2(csv_t *D, int col1, int col2) {
  *  specified two columns are in the same order in both rows.
  */
 int
-isconcordant (const csv_t *data, int row, int col1, int col2) {
-    assert (row >= 0 && row < data->nrows - 1);
-
+isconcordant (const csv_t *data, int row1, int row2, int col1, int col2) {
     /* either col1 is less than col2 in both rows, or col1 is greater than
      * col2 in both rows. This can be expressed using the exclusive or
      * operation. */
-    return ! (data->vals [row] [col1] > data->vals [row] [col2]) ^
-        (data->vals [row + 1] [col1] > data->vals [row + 1] [col2]);
+    return ! (data->vals [row1] [col1] > data->vals [row2] [col1]) ^
+        (data->vals [row1] [col2] > data->vals [row2] [col2]);
 }
 
 /****************************************************************/
