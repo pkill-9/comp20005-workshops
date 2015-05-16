@@ -239,7 +239,9 @@ read_csv_file(char *fname, csv_t *D) {
 				empties++;
 			}
 			/* mark the new end of the string */
-			line[j--] = '\0';
+            if (j >= 0) {
+                line[j--] = '\0';
+            }
 		}
 		rows++;
 		/* check to make sure don't overflow array */
