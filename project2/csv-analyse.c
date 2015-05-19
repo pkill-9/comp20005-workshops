@@ -2,7 +2,7 @@
  
    Written by Alistair Moffat, May 2015
 
-   Modifications by XXXXX, May 2015
+   Modifications by Matt Signorini, May 2015
    (Add your name and login name)
  */
 
@@ -45,8 +45,6 @@
 
 #define FILINP	1	/* indicates command input coming from a file */
 #define PROMPT	"> "
-
-#define NUMBUCKETS 20   /* number of divisions for the graph in stage 2 */
 
 /****************************************************************/
 
@@ -121,6 +119,10 @@ void swap_categories (category_t *c1, category_t *c2);
 
 int isconcordant (const csv_t *data, int row1, int row2, int col1, 
   int col2);
+
+int get_bucket_index (double lower_limit, double bucket_range, 
+  double value);
+char bucket_to_char (int bucket_count);
 
 /****************************************************************/
 
@@ -480,7 +482,7 @@ do_averge(csv_t *D, int col) {
  */
 void
 do_graph1(csv_t *D, int col) {
-    bucket_t buckets [NUMBUCKETS];
+    bucket_t buckets [GRAPHROWS];
     int row;
 
     /* col index starts at 1 for users. */
@@ -556,12 +558,75 @@ do_kndall(csv_t *d, int col1, int col2) {
 
 /****************************************************************/
 
-/* implement the 'p' plot command to generate
-   a 2d graph showing correlation between two columns
-*/
+/**
+ *  Generates a 2 dimensional version of the stage 2 plot, illustrating
+ *  the correlation between two columns.
+ */
 void   
-do_graph2(csv_t *D, int col1, int col2) {
-	return;
+do_graph2(csv_t *d, int col1, int col2) {
+    int buckets [GRAPHROWS] [GRAPHCOLS] = {{0}};
+    int row, col, xbin, ybin;
+
+    /* get max and min for both columns to calculate the range to be
+     * divided into buckets */
+    double ymin = getmin (d, col1) - EPSILON; 
+    double ymax = getmax (d, col1) + EPSILON;
+    double xmin = getmin (d, col2) - EPSILON; 
+    double xmax = getmax (d, col2) + EPSILON;
+
+    /* calculate the range of the buckets for the x and y dimensions. */
+    double xinterval = (xmax - xmin) / GRAPHCOLS;
+    double yinterval = (ymax - ymin) / GRAPHROWS;
+
+    for (row = 0; row < d->nrows; row ++) {
+        ybin = get_bucket_index (ymin, yinterval, d->vals [row] [col1]);
+        xbin = get_bucket_index (xmin, xinterval, d->vals [row] [col2]);
+        buckets [ybin] [xbin] += 1;
+    }
+
+    for (row = 0; row < GRAPHROWS; row ++) {
+        for (col = 0; col < GRAPHCOLS; col ++) {
+            printf ("%c", bucket_to_char (buckets [row] [col]));
+        }
+
+        printf ("\n");
+    }
+}
+
+/****************************************************************/
+
+/**
+ *  Return the index of the bucket that a given value belongs in, given
+ *  the lower limit of the range and the size of the interval covered by
+ *  each bucket.
+ */
+int
+get_bucket_index (double lower_limit, double bucket_range, double value) {
+    return (int) (value - lower_limit) / bucket_range;
+}
+
+/****************************************************************/
+
+/**
+ *  Returns the character that should be printed out, given the number of
+ *  values in a bucket. The density value must be only 1 char wide,
+ *  otherwise our plot would get mangled.
+ */
+char
+bucket_to_char (int bucket_count) {
+    const char *alphabet = "0123456789abcdef";
+
+    /* apply the formula specified in the project spec */
+    bucket_count = log ((double) bucket_count + 1.0) / log (2.0);
+
+    /* buckets with no values are displayed as "." */
+    if (bucket_count == 0)
+        return '.';
+
+    /* otherwise, lookup the character from the alphabet */
+    assert (bucket_count < strlen (alphabet));
+
+    return alphabet [bucket_count];
 }
 
 /****************************************************************/
@@ -593,10 +658,10 @@ void
 init_buckets (const csv_t *data, int col, bucket_t *buckets) {
     double min = getmin (data, col) - EPSILON;
     double max = getmax (data, col) + EPSILON;
-    double increment = (max - min) / NUMBUCKETS;
+    double increment = (max - min) / GRAPHROWS;
     int i;
 
-    for (i = 0; i < NUMBUCKETS; i ++) {
+    for (i = 0; i < GRAPHROWS; i ++) {
         buckets [i].lower = min + increment * i;
         buckets [i].upper = buckets [i].lower + increment;
         buckets [i].nitems = 0;
@@ -613,7 +678,7 @@ void
 add_to_buckets (bucket_t *buckets, double value) {
     int i;
 
-    for (i = 0; i < NUMBUCKETS; i ++) {
+    for (i = 0; i < GRAPHROWS; i ++) {
         if (value > buckets [i].lower && value < buckets [i].upper) {
             buckets [i].nitems += 1;
             return;
@@ -634,7 +699,7 @@ print_histogram (const csv_t *data, const bucket_t *buckets, int col) {
     printf ("graph of %s scaled by a factor of %d\n", data->labs [col],
       scaling);
 
-    for (row = 0; row < NUMBUCKETS; row ++) {
+    for (row = 0; row < GRAPHROWS; row ++) {
         printf ("%5.2f -- %5.2f [%4d]:", buckets [row].lower, 
           buckets [row].upper, buckets [row].nitems);
         print_bar (buckets [row].nitems, scaling);
@@ -669,7 +734,7 @@ get_scaling_factor (const bucket_t *buckets) {
 
     /** find the bucket with the most items in it. That will be the longest
      *  bar in the graph. */
-    for (i = 0; i < NUMBUCKETS; i ++) {
+    for (i = 0; i < GRAPHROWS; i ++) {
         if (buckets [i].nitems > maxitems)
             maxitems = buckets [i].nitems;
     }
