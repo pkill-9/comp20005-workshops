@@ -567,6 +567,9 @@ do_graph2(csv_t *d, int col1, int col2) {
     int buckets [GRAPHROWS] [GRAPHCOLS] = {{0}};
     int row, col, xbin, ybin;
 
+    /* map columns to zero origin */
+    col1 --; col2 --;
+
     /* get max and min for both columns to calculate the range to be
      * divided into buckets */
     double ymin = getmin (d, col1) - EPSILON; 
@@ -584,7 +587,10 @@ do_graph2(csv_t *d, int col1, int col2) {
         buckets [ybin] [xbin] += 1;
     }
 
-    for (row = 0; row < GRAPHROWS; row ++) {
+    for (row = GRAPHROWS - 1; row >= 0; row --) {
+        printf ("%6.2f--%6.2f: ", yinterval * row + ymin, 
+          yinterval * (row + 1) + ymin);
+
         for (col = 0; col < GRAPHCOLS; col ++) {
             printf ("%c", bucket_to_char (buckets [row] [col]));
         }
@@ -602,7 +608,7 @@ do_graph2(csv_t *d, int col1, int col2) {
  */
 int
 get_bucket_index (double lower_limit, double bucket_range, double value) {
-    return (int) (value - lower_limit) / bucket_range;
+    return (value - lower_limit) / bucket_range;
 }
 
 /****************************************************************/
