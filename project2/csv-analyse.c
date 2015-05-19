@@ -108,7 +108,8 @@ void    do_graph2(csv_t *D, int col1, int col2);
 void init_buckets (const csv_t *data, int col, bucket_t *buckets);
 void add_to_buckets (bucket_t *buckets, double value);
 void print_histogram (const csv_t *data, const bucket_t *buckets, int col);
-void print_bar (int length);
+int get_scaling_factor (const bucket_t *buckets);
+void print_bar (int length, int scaling_factor);
 double getmax (const csv_t *data, int col);
 double getmin (const csv_t *data, int col);
 
@@ -628,14 +629,15 @@ add_to_buckets (bucket_t *buckets, double value) {
  */
 void
 print_histogram (const csv_t *data, const bucket_t *buckets, int col) {
-    int row;
+    int row, scaling = get_scaling_factor (buckets);
 
-    printf ("graph of %s scaled by a factor of 1\n", data->labs [col]);
+    printf ("graph of %s scaled by a factor of %d\n", data->labs [col],
+      scaling);
 
     for (row = 0; row < NUMBUCKETS; row ++) {
         printf ("%5.2f -- %5.2f [%4d]:", buckets [row].lower, 
           buckets [row].upper, buckets [row].nitems);
-        print_bar (buckets [row].nitems);
+        print_bar (buckets [row].nitems, scaling);
     }
 }
 
@@ -645,11 +647,35 @@ print_histogram (const csv_t *data, const bucket_t *buckets, int col) {
  *  Prints a bar of the histogram for stage 2, with a newline at the end.
  */
 void
-print_bar (int length) {
-    for (; length > 0; length -= 1)
+print_bar (int length, int scaling_factor) {
+    for (; length > 0; length -= scaling_factor)
         printf ("*");
 
     printf ("\n");
+}
+
+/****************************************************************/
+
+/**
+ *  Returns the number of units that each star should represent such that
+ *  the longest bar of the graph will not go over the 80 column margin.
+ *
+ *  For example, if this function returns 4, each star should represent 4
+ *  items in the bucket.
+ */
+int
+get_scaling_factor (const bucket_t *buckets) {
+    int maxitems = buckets [0].nitems, i;
+
+    /** find the bucket with the most items in it. That will be the longest
+     *  bar in the graph. */
+    for (i = 0; i < NUMBUCKETS; i ++) {
+        if (buckets [i].nitems > maxitems)
+            maxitems = buckets [i].nitems;
+    }
+
+    /** allow up to 60 stars in a bar of the graph */
+    return maxitems / 60 + 1;
 }
 
 /****************************************************************/
