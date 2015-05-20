@@ -68,15 +68,6 @@ typedef struct {
 } command_t;
 
 /**
- *  This structure is used to build the histogram for stage 2.
- */
-typedef struct {
-    double upper;
-    double lower;
-    int nitems;
-} bucket_t;
-
-/**
  *  Structure to contain data about categories. To compute the average, we
  *  need to know how many items in the category and what they sum to.
  */
@@ -103,10 +94,7 @@ void    do_catavg(csv_t *D, int cat, int col);
 void    do_kndall(csv_t *D, int col1, int col2);
 void    do_graph2(csv_t *D, int col1, int col2);
 
-void init_buckets (const csv_t *data, int col, bucket_t *buckets);
-void add_to_buckets (bucket_t *buckets, double value);
-void print_histogram (const csv_t *data, const bucket_t *buckets, int col);
-int get_scaling_factor (const bucket_t *buckets);
+int get_scaling_factor (const int *buckets);
 void print_bar (int length, int scaling_factor);
 double getmax (const csv_t *data, int col);
 double getmin (const csv_t *data, int col);
@@ -481,22 +469,38 @@ do_averge(csv_t *D, int col) {
  *  Implement the 'g' graphing command. Plots a histogram of the data.
  */
 void
-do_graph1(csv_t *D, int col) {
-    bucket_t buckets [GRAPHROWS];
-    int row;
+do_graph1(csv_t *d, int col) {
+    int buckets [GRAPHROWS] = {0};
+    int row, scale_factor, bucket_index;
 
-    /* col index starts at 1 for users. */
-    col -= 1;
+    /* map columns to zero origin */
+    col --;
 
-    init_buckets (D, col, buckets);
+    /* find out the range of values in the specified column, and hence
+     * how wide will be the range of each bucket. */
+    double max = getmax (d, col);
+    double min = getmin (d, col);
+    double bucket_width = (max - min) / GRAPHROWS;
 
-    for (row = 0; row < D->nrows; row ++) {
-        add_to_buckets (buckets, D->vals [row] [col]);
+    /* step through all the rows in the dataset, and figure out which
+     * bucket the value in the focus column belongs in. */
+    for (row = 0; row < d->nrows; row ++) {
+        bucket_index = get_bucket_index (min, bucket_width, 
+          d->vals [row] [col]);
+        buckets [bucket_index] += 1;
     }
 
-    print_histogram (D, buckets, col);
+    /* now step through the buckets, and print out the rows of stars. */
+    scale_factor = get_scaling_factor (buckets);
 
-	return;
+    printf ("graph of %s scaled by a factor of %d\n", d->labs [col],
+      scale_factor);
+
+    for (row = GRAPHROWS - 1; row >= 0; row --) {
+        printf ("%6.2f--%6.2f [%4d]:", min + row * bucket_width,
+          min + (row + 1) * bucket_width, buckets [row]);
+        print_bar (buckets [row], scale_factor);
+    }
 }
 
 /****************************************************************/
@@ -655,66 +659,6 @@ isconcordant (const csv_t *data, int row1, int row2, int col1, int col2) {
 /****************************************************************/
 
 /**
- *  Initialise the buckets array which is used to produce the histogram in
- *  stage 2. This function will set the upper and lower limits of each
- *  bucket in the array to cover the range of the data, and will set all
- *  the counts to zero.
- */
-void
-init_buckets (const csv_t *data, int col, bucket_t *buckets) {
-    double min = getmin (data, col) - EPSILON;
-    double max = getmax (data, col) + EPSILON;
-    double increment = (max - min) / GRAPHROWS;
-    int i;
-
-    for (i = 0; i < GRAPHROWS; i ++) {
-        buckets [i].lower = min + increment * i;
-        buckets [i].upper = buckets [i].lower + increment;
-        buckets [i].nitems = 0;
-    }
-}
-
-/****************************************************************/
-
-/**
- *  Increments the items count for the bucket corresponding to the given
- *  value.
- */
-void
-add_to_buckets (bucket_t *buckets, double value) {
-    int i;
-
-    for (i = 0; i < GRAPHROWS; i ++) {
-        if (value > buckets [i].lower && value < buckets [i].upper) {
-            buckets [i].nitems += 1;
-            return;
-        }
-    }
-}
-
-/****************************************************************/
-
-/**
- *  Prints the output for stage 2; a histogram of the data down a given
- *  column.
- */
-void
-print_histogram (const csv_t *data, const bucket_t *buckets, int col) {
-    int row, scaling = get_scaling_factor (buckets);
-
-    printf ("graph of %s scaled by a factor of %d\n", data->labs [col],
-      scaling);
-
-    for (row = GRAPHROWS - 1; row >= 0; row --) {
-        printf ("%6.2f--%6.2f [%4d]:", buckets [row].lower, 
-          buckets [row].upper, buckets [row].nitems);
-        print_bar (buckets [row].nitems, scaling);
-    }
-}
-
-/****************************************************************/
-
-/**
  *  Prints a bar of the histogram for stage 2, with a newline at the end.
  */
 void
@@ -735,14 +679,14 @@ print_bar (int length, int scaling_factor) {
  *  items in the bucket.
  */
 int
-get_scaling_factor (const bucket_t *buckets) {
-    int maxitems = buckets [0].nitems, i;
+get_scaling_factor (const int *buckets) {
+    int maxitems = buckets [0], i;
 
     /** find the bucket with the most items in it. That will be the longest
      *  bar in the graph. */
     for (i = 0; i < GRAPHROWS; i ++) {
-        if (buckets [i].nitems > maxitems)
-            maxitems = buckets [i].nitems;
+        if (buckets [i] > maxitems)
+            maxitems = buckets [i];
     }
 
     /** allow up to 60 stars in a bar of the graph */
