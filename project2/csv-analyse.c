@@ -706,7 +706,7 @@ print_histogram (const csv_t *data, const bucket_t *buckets, int col) {
       scaling);
 
     for (row = GRAPHROWS - 1; row >= 0; row --) {
-        printf ("%5.2f -- %5.2f [%4d]:", buckets [row].lower, 
+        printf ("%6.2f--%6.2f [%4d]:", buckets [row].lower, 
           buckets [row].upper, buckets [row].nitems);
         print_bar (buckets [row].nitems, scaling);
     }
