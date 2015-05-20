@@ -1,0 +1,98 @@
+\documentclass{beamer}
+
+\usetheme{Frankfurt}
+
+\title{Workshop 10 -- More Structs}
+\author{COMP20005 Engineering Computation}
+\institute{The University of Melbourne}
+
+\begin{document}
+
+\renewcommand{\tt}[1]{\texttt{#1}}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Contact Info}
+    \begin{itemize}
+        \item Matt Signorini
+        \item Email: \tt{msignorini@unimelb.edu.au}
+        \item Also LMS discussion forum for help
+        \item My workshop solutions available at \url{https://github.com/pkill-9/comp20005-workshops/}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Today's Workshop}
+    \begin{block}{Agenda}
+        By the end of this class, you should:
+        \begin{itemize}
+            \item Be able to convert numbers between decimal and binary
+                form for both two's complement integers and simple 
+                floating point numbers.
+            \item Be able to do simple arithmetic operations on numbers
+                in binary form.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\section{Exercises}
+\stepcounter{subsection}
+
+\begin{frame}{13.1}
+    Suppose that a machine uses 6 bits to represent integers. Calculate
+    the two's complement representations for each of these values:
+    0, 4, 9, -1, -8 and -31. Verify that $19 - 8 = 11$
+\end{frame}
+
+\begin{frame}{13.2}
+    Consider a 16 bit floating point representation that uses 1 bit for 
+    the sign, 3 bits for the exponent and 12 bits for the mantissa. 
+    Calculate the binary representations of these numbers: 2.0, -2.5, 
+    7.875.
+
+    You will need to convert the fractions from decimal to binary, for
+    which you may find this website helpful: 
+    \url{http://cs.furman.edu/digitaldomain/more/ch6/dec\_frac\_to\_bin.htm}
+\end{frame}
+
+\begin{frame}{13.3}
+    Using the same 16 bit float representation, what are the largest and
+    smallest values that can be represented, in terms of absolute value?
+\end{frame}
+
+
+\section{Lab Exercises}
+\stepcounter{subsection}
+
+\begin{frame}{Exercises}
+    \begin{block}{Project 2}
+        Continue working on your projects. If you have finished stage 5,
+        try to further refine your work. Do you have some long functions?
+        Could your approach to the problem be better described in your
+        comments? (you \emph{do} have comments, right?)
+    \end{block}
+\end{frame}
+
+%
+%  ____________________________________
+% / If God had a beard, he'd be a UNIX \
+% \ programmer.                        /
+%  ------------------------------------
+%     \
+%      \
+%                                    .::!!!!!!!:.
+%   .!!!!!:.                        .:!!!!!!!!!!!!
+%   ~~~~!!!!!!.                 .:!!!!!!!!!UWWW$$$ 
+%       :$$NWX!!:           .:!!!!!!XUWW$$$$$$$$$P 
+%       $$$$$##WX!:      .<!!!!UW$$$$"  $$$$$$$$# 
+%       $$$$$  $$$UX   :!!UW$$$$$$$$$   4$$$$$* 
+%       ^$$$B  $$$$\     $$$$$$$$$$$$   d$$R" 
+%         "*$bd$$$$      '*$$$$$$$$$$$o+#" 
+%              """"          """"""" 
+%
+
+
+\end{document}
+
+% vim: ft=tex ts=4 sw=4 lbr et
