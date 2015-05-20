@@ -705,7 +705,7 @@ print_histogram (const csv_t *data, const bucket_t *buckets, int col) {
     printf ("graph of %s scaled by a factor of %d\n", data->labs [col],
       scaling);
 
-    for (row = 0; row < GRAPHROWS; row ++) {
+    for (row = GRAPHROWS - 1; row >= 0; row --) {
         printf ("%5.2f -- %5.2f [%4d]:", buckets [row].lower, 
           buckets [row].upper, buckets [row].nitems);
         print_bar (buckets [row].nitems, scaling);
