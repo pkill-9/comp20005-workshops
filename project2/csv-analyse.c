@@ -46,6 +46,9 @@
 #define FILINP	1	/* indicates command input coming from a file */
 #define PROMPT	"> "
 
+/* test if two floating point numbers are equal within a small margin. */
+#define EQUAL(a, b)     (fabs ((a) - (b)) < EPSILON)
+
 /****************************************************************/
 
 /* structure declarations -- probably no need to change these,
@@ -545,6 +548,13 @@ do_kndall(csv_t *d, int col1, int col2) {
 
     for (i = 0; i < d->nrows; i ++) {
         for (j = i + 1; j < d->nrows; j ++) {
+            /* if the two rows have the same values in either columns,
+             * they do not count to the concordant/disconcordant totals */
+            if (EQUAL (d->vals [i] [col1], d->vals [j] [col1]) ||
+              EQUAL (d->vals [i] [col2], d->vals [j] [col2])) {
+                continue;
+            }
+
             if (isconcordant (d, i, j, col1, col2)) {
                 concordant ++;
             } else {
