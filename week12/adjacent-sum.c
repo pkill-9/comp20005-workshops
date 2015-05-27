@@ -26,7 +26,6 @@ run_t;
 /**********************************************************/
 
 void adjacent_sum (run_t *max, const int *array, int length);
-int sumitems (const int *array, int length);
 void print_array (const int *array, int length);
 
 
@@ -79,9 +78,11 @@ adjacent_sum (run_t *max, const int *array, int length)
      *  and all end indices from the start index to the end of the array */
     for (start = 0; start < length; start ++)
     {
+        current_sum = 0;
+
         for (end = start; end < length; end ++)
         {
-            current_sum = sumitems (array + start, RUN_LENGTH (start, end));
+            current_sum += array [end];
 
             if (current_sum > max->sum)
             {
@@ -92,26 +93,6 @@ adjacent_sum (run_t *max, const int *array, int length)
             }
         }
     }
-}
-
-
-/**********************************************************/
-
-/**
- *  Returns the sum of the items in the specified array.
- */
-    int
-sumitems (const int *array, int length)
-{
-    int sum = 0;
-
-    /** this is a bit terse, but works. length is used as an index into
-     *  the array, summing items from the end back to the start. Note the
-     *  initial decrement of length, to get the index of the last item. */
-    for (length --; length >= 0; length --)
-        sum += array [length];
-
-    return sum;
 }
 
 
