@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 
+#define MAXITEMS        100
+
 /** find the length of a run of items in an array from the indices of the
  *  first and last elements in the run */
 #define RUN_LENGTH(start, end)  ((end) - (start) + 1)
@@ -25,6 +27,31 @@ run_t;
 
 void adjacent_sum (run_t *max, const int *array, int length);
 int sumitems (const int *array, int length);
+void print_array (const int *array, int length);
+
+
+/**********************************************************/
+
+    int
+main (void)
+{
+    int array [MAXITEMS], length = 0;
+    run_t max_run;
+
+    /** prompt the user to enter some input. */
+    printf ("Enter up to %d ints:\n", MAXITEMS);
+
+    while (scanf ("%d", &(array [length ++])) == 1 && (length < MAXITEMS))
+        ;
+
+    /** find the run of adjacent elements with the biggest sum */
+    adjacent_sum (&max_run, array, length);
+
+    printf ("Adjacent elements with maximum sum:\n");
+    print_array (array + max_run.start_index, max_run.length);
+
+    return 0;
+}
 
 
 /**********************************************************/
@@ -50,9 +77,9 @@ adjacent_sum (run_t *max, const int *array, int length)
 
     /** Step through all start indices, from 0 to the end of the array,
      *  and all end indices from the start index to the end of the array */
-    for (start = 0; start > length; start ++)
+    for (start = 0; start < length; start ++)
     {
-        for (end = start; end > length; end ++)
+        for (end = start; end < length; end ++)
         {
             current_sum = sumitems (array + start, RUN_LENGTH (start, end));
 
@@ -85,6 +112,23 @@ sumitems (const int *array, int length)
         sum += array [length];
 
     return sum;
+}
+
+
+/**********************************************************/
+
+/**
+ *  Prints the given array on stdout, with a newline at the end.
+ */
+    void
+print_array (const int *array, int length)
+{
+    int i;
+
+    for (i = 0; i < length; i ++)
+        printf ("%d ", array [i]);
+
+    printf ("\n");
 }
 
 
