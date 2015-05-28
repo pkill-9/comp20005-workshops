@@ -66,7 +66,7 @@ main (void)
     void
 adjacent_sum (run_t *max, const int *array, int length)
 {
-    int start = 0, end, current_sum;
+    int start = 0, end, current_sum = 0;
 
     /** initialise the max to a run containing only the first item in the
      *  array */
@@ -74,23 +74,29 @@ adjacent_sum (run_t *max, const int *array, int length)
     max->length = 1;
     max->sum = array [0];
 
-    /** Step through all start indices, from 0 to the end of the array,
-     *  and all end indices from the start index to the end of the array */
-    for (start = 0; start < length; start ++)
+    /** Kadane's algorithm. Finds the maximum subarray in a single pass
+     *  through the input array, O(n) time. If you are interested, this
+     *  algorithm uses a technique called dynamic programming, which is
+     *  not covered in comp20005, but which you will encounter in later
+     *  algorithms subjects if you pursue computer science or software
+     *  eng. */
+    for (end = 0; end < length; end ++)
     {
-        current_sum = 0;
+        current_sum += array [end];
 
-        for (end = start; end < length; end ++)
+        /** if the current sum is less than zero, this subarray is
+         *  suboptimal, so we will reset our current sum. */
+        if (current_sum < 0)
         {
-            current_sum += array [end];
+            current_sum = 0;
+            start = end + 1;
+        }
 
-            if (current_sum > max->sum)
-            {
-                /** found a new max */
-                max->start_index = start;
-                max->length = RUN_LENGTH (start, end);
-                max->sum = current_sum;
-            }
+        if (current_sum > max->sum)
+        {
+            max->sum = current_sum;
+            max->length = RUN_LENGTH (start, end);
+            max->start_index = start;
         }
     }
 }
