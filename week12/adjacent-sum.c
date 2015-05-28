@@ -40,8 +40,8 @@ main (void)
     /** prompt the user to enter some input. */
     printf ("Enter up to %d ints:\n", MAXITEMS);
 
-    while (scanf ("%d", &(array [length ++])) == 1 && (length < MAXITEMS))
-        ;
+    while (scanf ("%d", array + length) == 1 && (length < MAXITEMS))
+        length ++;
 
     /** find the run of adjacent elements with the biggest sum */
     adjacent_sum (&max_run, array, length);
@@ -86,10 +86,10 @@ adjacent_sum (run_t *max, const int *array, int length)
 
         /** if the current sum is less than zero, this subarray is
          *  suboptimal, so we will reset our current sum. */
-        if (current_sum < 0)
+        if (current_sum < array [end])
         {
-            current_sum = 0;
-            start = end + 1;
+            current_sum = array [end];
+            start = end;
         }
 
         if (current_sum > max->sum)
