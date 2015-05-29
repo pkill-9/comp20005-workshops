@@ -1,18 +1,21 @@
 # Compiles and tests the solutions to week 8 lab exercises.
 
 CC=gcc
-CFLAGS=-Wall -ansi -O0 -g -pg
+CFLAGS=-Wall -ansi 
 
-all:		adjacent-sum
+all:		adjacent-sum poker
 
 adjacent-sum:	adjacent-sum.o
 	$(CC) $(CFLAGS) -o adjacent-sum adjacent-sum.o
 
+poker:		poker.o
+	$(CC) $(CFLAGS) -o poker poker.o
+
 clean:
-	rm adjacent-sum.o
+	rm adjacent-sum.o poker.o
 
 scrub:		clean
-	rm adjacent-sum
+	rm adjacent-sum poker
 
 
 .PHONY:		all clean scrub

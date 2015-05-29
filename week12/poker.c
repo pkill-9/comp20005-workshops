@@ -6,11 +6,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "utils.h"
 
 #define CARDS_PER_PACK      52
+#define CARDS_PER_SUIT      13
 #define CARDS_PER_HAND      5
+#define NUMPLAYERS          4
 
 /**********************************************************/
 
@@ -27,6 +30,50 @@ void print_card (card_t card);
 
 /** this global keeps track of which cards have been dealt so far. */
 bool dealt [CARDS_PER_PACK] = {0};
+
+/**********************************************************/
+
+/**
+ *  Program to deal four poker hands.
+ */
+    int
+main (int argc, char **argv)
+{
+    int player, card;
+    card_t hand [CARDS_PER_HAND];
+
+    /** if the user provides a seed as a command line parameter, use that,
+     *  otherwise, use the current time. */
+    if (argc != 2)
+    {
+        srand (time (NULL));
+    }
+    else
+    {
+        srand (atoi (argv [1]));
+    }
+
+    /** deal cards */
+    for (player = 0; player < NUMPLAYERS; player ++)
+    {
+        deal_hand (hand);
+
+        printf ("player %d:    ", player);
+
+        for (card = 0; card < CARDS_PER_HAND; card ++)
+        {
+            /** print separating commas between cards */
+            if (card > 0)
+                printf (", ");
+
+            print_card (hand [card]);
+        }
+
+        printf ("\n");
+    }
+
+    return 0;
+}
 
 /**********************************************************/
 
@@ -78,7 +125,7 @@ print_card (card_t card)
             "9", "10", "J", "K", "Q"};
 
     int suit = card / CARDS_PER_PACK;
-    int face_value = card % CARDS_PER_PACK;
+    int face_value = card % CARDS_PER_SUIT;
 
     printf ("%s-%s", face_values [face_value], suits [suit]);
 }
@@ -102,7 +149,7 @@ empty_pack (void)
             num_cards ++;
     }
 
-    return (num_cards >= CARDS_PER_HAND)? true : false;
+    return (num_cards < CARDS_PER_HAND)? true : false;
 }
 
 /**********************************************************/
