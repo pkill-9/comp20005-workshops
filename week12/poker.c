@@ -14,6 +14,7 @@
 #define CARDS_PER_SUIT      13
 #define CARDS_PER_HAND      5
 #define NUMPLAYERS          4
+#define NUMGAMES            10000
 
 /**********************************************************/
 
@@ -25,6 +26,8 @@ void deal_hand (card_t *hand);
 bool empty_pack (void);
 void reset_pack (void);
 void print_card (card_t card);
+void count_duplicates (card_t *hand, int *counts);
+bool same_face_value (card_t c1, card_t c2);
 
 /**********************************************************/
 
@@ -39,7 +42,8 @@ bool dealt [CARDS_PER_PACK] = {0};
     int
 main (int argc, char **argv)
 {
-    int player, card;
+    int player, game, i;
+    int counts [CARDS_PER_HAND] = {0};
     card_t hand [CARDS_PER_HAND];
 
     /** if the user provides a seed as a command line parameter, use that,
@@ -53,26 +57,78 @@ main (int argc, char **argv)
         srand (atoi (argv [1]));
     }
 
-    /** deal cards */
-    for (player = 0; player < NUMPLAYERS; player ++)
+    /** we will simulate the dealing of 10,000 4 player poker games, to
+     *  see how many times hands contain multiple cards with the same
+     *  face value.
+     */
+    for (game = 0; game < NUMGAMES; game ++)
     {
-        deal_hand (hand);
-
-        printf ("player %d:    ", player);
-
-        for (card = 0; card < CARDS_PER_HAND; card ++)
+        /** deal cards */
+        for (player = 0; player < NUMPLAYERS; player ++)
         {
-            /** print separating commas between cards */
-            if (card > 0)
-                printf (", ");
-
-            print_card (hand [card]);
+            deal_hand (hand);
+            count_duplicates (hand, counts);
         }
 
-        printf ("\n");
+        reset_pack ();
     }
 
+    /** print out how many hands had duplicates, eg two of a kind or three
+     *  of a kind. This will not count the number of hands with a full
+     *  house. */
+    for (i = 0; i < CARDS_PER_HAND; i ++)
+        printf ("%d of a kind: %6d hands.\n", i + 1, counts [i]);
+
     return 0;
+}
+
+/**********************************************************/
+
+/**
+ *  Count cards that repeat multiple times, and increment counters in
+ *  the given array. The array counts single non repeated cards in the
+ *  first element, pair in the second, triplets in the third element and
+ *  so on.
+ */
+    void
+count_duplicates (card_t *hand, int *counts)
+{
+    int count, i, j;
+    bool counted [CARDS_PER_HAND] = {0};
+
+    /** For each card in the hand, step through the other cards and see if
+     *  any have the same face value. If any do, increment the count, and
+     *  mark those cards as counted. */
+    for (i = 0; i < CARDS_PER_HAND; i ++)
+    {
+        if (counted [i])
+            continue;
+
+        count = 0;
+        counted [i] = true;
+
+        for (j = i + 1; j < CARDS_PER_HAND; j ++)
+        {
+            if (same_face_value (hand [i], hand [j]))
+            {
+                count ++;
+                counted [j] = true;
+            }
+        }
+
+        counts [count] += 1;
+    }
+}
+
+/**********************************************************/
+
+/**
+ *  Test if two cards have the same face value.
+ */
+    bool
+same_face_value (card_t c1, card_t c2)
+{
+    return (c1 % CARDS_PER_SUIT == c2 % CARDS_PER_SUIT)? true : false;
 }
 
 /**********************************************************/
