@@ -28,6 +28,7 @@ void reset_pack (void);
 void print_card (card_t card);
 void count_duplicates (card_t *hand, int *counts);
 bool same_face_value (card_t c1, card_t c2);
+bool full_house (card_t *hand);
 
 /**********************************************************/
 
@@ -44,6 +45,7 @@ main (int argc, char **argv)
 {
     int player, game, i;
     int counts [CARDS_PER_HAND] = {0};
+    int full_house_hands = 0;
     card_t hand [CARDS_PER_HAND];
 
     /** if the user provides a seed as a command line parameter, use that,
@@ -68,6 +70,9 @@ main (int argc, char **argv)
         {
             deal_hand (hand);
             count_duplicates (hand, counts);
+
+            if (full_house (hand))
+                full_house_hands += 1;
         }
 
         reset_pack ();
@@ -78,6 +83,8 @@ main (int argc, char **argv)
      *  house. */
     for (i = 0; i < CARDS_PER_HAND; i ++)
         printf ("%d of a kind: %6d hands.\n", i + 1, counts [i]);
+
+    printf ("Full house hands: %6d\n", full_house_hands);
 
     return 0;
 }
@@ -118,6 +125,19 @@ count_duplicates (card_t *hand, int *counts)
 
         counts [count] += 1;
     }
+}
+
+/**********************************************************/
+
+/**
+ *  Test if a hand is a full house, ie contains 3 of a kind and a pair.
+ */
+    bool
+full_house (card_t *hand)
+{
+    int duplicates [CARDS_PER_HAND] = {0};
+    count_duplicates (hand, duplicates);
+    return (duplicates [2] == 1 && duplicates [1] == 1)? true : false;
 }
 
 /**********************************************************/
