@@ -3,7 +3,7 @@
 CC=gcc
 CFLAGS=-Wall -ansi 
 
-all:		adjacent-sum poker
+all:		adjacent-sum poker rocket
 
 adjacent-sum:	adjacent-sum.o
 	$(CC) $(CFLAGS) -o adjacent-sum adjacent-sum.o
@@ -11,11 +11,14 @@ adjacent-sum:	adjacent-sum.o
 poker:		poker.o
 	$(CC) $(CFLAGS) -o poker poker.o
 
+rocket:		rocket.o
+	$(CC) $(CFLAGS) -o rocket rocket.o
+
 clean:
-	rm adjacent-sum.o poker.o
+	rm adjacent-sum.o poker.o rocket.o
 
 scrub:		clean
-	rm adjacent-sum poker
+	rm adjacent-sum poker rocket
 
 
 .PHONY:		all clean scrub
