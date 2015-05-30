@@ -33,6 +33,7 @@ double mass (double time);
 double dmdt (double time);
 double drag (double velocity);
 double acceleration (double velocity, double time);
+void print_altitude (double min, double max);
 
 /**********************************************************/
 
@@ -42,7 +43,9 @@ main (int argc, char **argv)
     double time = 0;
     double velocity = 0, height = 0;
     double max_height = 0;
+    double min_height_this_second = 0, max_height_this_second = 0;
     double a;
+    int steps_this_second = 0;
 
     while (height >= 0)
     {
@@ -56,12 +59,50 @@ main (int argc, char **argv)
         if (height > max_height)
             max_height = height;
 
+        /** keep track of the range of altitudes each second */
+        if (height > max_height_this_second)
+            max_height_this_second = height;
+
+        if (height < min_height_this_second)
+            min_height_this_second = height;
+
+        /** has one second elapsed? */
+        if (steps_this_second >= 1.0 / STEP_SIZE)
+        {
+            print_altitude (min_height_this_second, max_height_this_second);
+            steps_this_second = 0;
+            max_height_this_second = min_height_this_second = height;
+        }
+
         time += STEP_SIZE;
+        steps_this_second ++;
     }
 
     printf ("Maximum altitude: %10.3f m\n", max_height);
 
     return 0;
+}
+
+/**********************************************************/
+
+/**
+ *  Plots what range of altitudes the rocket was in, used to produce a
+ *  graph of the flight.
+ */
+    void
+print_altitude (double min, double max)
+{
+    int i;
+
+    /** pad with spaces before the min */
+    for (i = 0; i < min; i += 10)
+        printf (" ");
+
+    /** print where the rocket was */
+    for (i = min; i < max; i += 10)
+        printf ("#");
+
+    printf ("\n");
 }
 
 /**********************************************************/
